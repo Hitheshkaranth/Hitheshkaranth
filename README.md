@@ -13,13 +13,6 @@
 
 I lead technology at [FlyVI Technologies](https://www.flyvitech.com/), where I work on high-reliability aerospace, defence, power-electronics, and embedded-control systems. My independent work focuses on tools that make complex engineering systems easier to inspect, operate, and verify.
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://skillicons.dev/icons?i=ts,python,rust,cpp,react,fastapi,docker,tauri,qt,linux,git,github&theme=dark">
-    <img src="https://skillicons.dev/icons?i=ts,python,rust,cpp,react,fastapi,docker,tauri,qt,linux,git,github&theme=light" alt="Tools & Technologies">
-  </picture>
-</p>
-
 ## Building now
 
 <table>

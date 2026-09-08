@@ -1,0 +1,35 @@
+<svg width="1200" height="300" viewBox="0 0 1200 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title description">
+  <title id="title">Hithesh Karanth, CTO and open-source systems builder</title>
+  <desc id="description">Profile banner highlighting aerospace, embedded systems, AI tooling, the Sarvam Epoch Buildathon win, and Noyce IDE.</desc>
+
+  <rect width="1200" height="300" rx="16" fill="#08111F"/>
+  <rect x="1" y="1" width="1198" height="298" rx="15" stroke="#1F3B61" stroke-width="2"/>
+
+  <g opacity="0.42" stroke="#2F81F7" stroke-width="2">
+    <path d="M0 56H116L150 90H258"/>
+    <path d="M0 244H92L132 204H244"/>
+    <path d="M962 42H1088L1122 76H1200"/>
+    <path d="M934 258H1062L1102 218H1200"/>
+  </g>
+  <g fill="#58A6FF">
+    <circle cx="150" cy="90" r="5"/>
+    <circle cx="132" cy="204" r="5"/>
+    <circle cx="1122" cy="76" r="5"/>
+    <circle cx="1102" cy="218" r="5"/>
+  </g>
+
+  <text x="72" y="72" fill="#79C0FF" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="700" letter-spacing="2">OPEN-SOURCE SYSTEMS · AEROSPACE · AI TOOLING</text>
+  <text x="68" y="144" fill="#F0F6FC" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="54" font-weight="750">Hithesh Karanth</text>
+  <text x="72" y="187" fill="#B7C9E2" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20">CTO, FlyVI Technologies · Complex engineering systems</text>
+
+  <rect x="72" y="222" width="229" height="38" rx="8" fill="#0D2542" stroke="#2F81F7"/>
+  <circle cx="94" cy="241" r="6" fill="#3FB950"/>
+  <text x="110" y="247" fill="#E6EDF3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="16" font-weight="650">Building Noyce IDE</text>
+
+  <rect x="856" y="91" width="276" height="118" rx="12" fill="#0D1B2E" stroke="#31547D"/>
+  <circle cx="887" cy="123" r="12" fill="#D29922"/>
+  <path d="M881 122.5L885.5 127L894 118.5" stroke="#08111F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="910" y="127" fill="#D29922" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="700" letter-spacing="1.2">2026 WINNER</text>
+  <text x="884" y="163" fill="#F0F6FC" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="700">Sarvam Epoch</text>
+  <text x="884" y="189" fill="#9FB3CC" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="16">WireVoice · Voice AI</text>
+</svg>

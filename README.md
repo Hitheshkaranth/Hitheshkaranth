@@ -1,16 +1,14 @@
+<p align="center">
+<img src="./assets/profile-header.svg" width="100%" alt="Hithesh Karanth, CTO at FlyVI Technologies and open-source systems builder working across aerospace, embedded systems, financial platforms, and AI tooling">
+</p>
+
 <div align="center">
 
-# Hithesh Karanth
-
-**CTO at [FlyVI Technologies](https://www.flyvitech.com/) · Open-source systems builder**
-
-Building across aerospace, financial platforms, AI-native development, and embedded software.
+**[CTO at FlyVI Technologies](https://www.flyvitech.com/)** · **[Building Noyce IDE](https://github.com/Hitheshkaranth/noyce-ide-dist)** · **Sarvam Epoch Buildathon Winner**
 
 [![GitHub followers](https://img.shields.io/github/followers/Hitheshkaranth?style=flat-square&logo=github&label=Followers&color=0969da)](https://github.com/Hitheshkaranth?tab=followers)
 [![OpenTerminalUI stars](https://img.shields.io/github/stars/Hitheshkaranth/OpenTerminalUI?style=flat-square&logo=github&label=OpenTerminalUI&color=d29922)](https://github.com/Hitheshkaranth/OpenTerminalUI/stargazers)
 [![Profile views](https://komarev.com/ghpvc/?username=Hitheshkaranth&style=flat-square&color=1f6feb)](https://github.com/Hitheshkaranth)
-
-🏆 **Winner, Sarvam Epoch Buildathon 2026**
 
 </div>
 
@@ -71,6 +69,7 @@ A self-hosted financial terminal for traders, researchers, and quant teams. It c
 <h3><a href="https://github.com/Hitheshkaranth/OpenTokenMonitor">OpenTokenMonitor</a></h3>
 <a href="https://github.com/Hitheshkaranth/OpenTokenMonitor/stargazers"><img src="https://img.shields.io/github/stars/Hitheshkaranth/OpenTokenMonitor?style=flat-square&logo=github&label=stars" alt="OpenTokenMonitor stars"></a>
 <img src="https://img.shields.io/github/languages/top/Hitheshkaranth/OpenTokenMonitor?style=flat-square" alt="OpenTokenMonitor primary language">
+<a href="https://github.com/Hitheshkaranth/OpenTokenMonitor/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-0969da?style=flat-square" alt="OpenTokenMonitor MIT license"></a>
 <br><br>
 A lightweight, local-first desktop monitor for Claude, Codex, Gemini, and other AI coding tools. It puts usage, quota windows, activity trends, and cost signals into one privacy-first widget instead of scattering them across provider dashboards.
 <br><br><code>Rust</code> <code>Tauri</code> <code>Desktop</code> <code>Local-first</code>

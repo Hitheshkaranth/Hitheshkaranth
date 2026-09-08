@@ -99,26 +99,13 @@ I lead technology at [FlyVI Technologies](https://www.flyvitech.com/), where I w
 
 ## Analytics & Activity
 
-<p align="center">
-  <a href="https://github.com/Hitheshkaranth">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-activity-graph.vercel.app/graph?username=Hitheshkaranth&bg_color=1C1C1E&color=F5F5F7&line=2997FF&point=FF5F56&area=true&hide_border=true">
-      <img width="100%" src="https://github-readme-activity-graph.vercel.app/graph?username=Hitheshkaranth&bg_color=F5F5F7&color=1D1D1F&line=0071E3&point=FF5F56&area=true&hide_border=true" alt="Hithesh Karanth's Activity Graph">
-    </picture>
-  </a>
-</p>
+### Contributions
 
 <p align="center">
-  <a href="https://github.com/Hitheshkaranth">
+  <a href="https://github.com/Hitheshkaranth?tab=overview">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats.vercel.app/api?username=Hitheshkaranth&show_icons=true&theme=transparent&title_color=2997FF&text_color=F5F5F7&icon_color=27C93F&hide_border=true">
-      <img height="180" src="https://github-readme-stats.vercel.app/api?username=Hitheshkaranth&show_icons=true&theme=transparent&title_color=0071E3&text_color=1D1D1F&icon_color=27C93F&hide_border=true" alt="Hithesh Karanth's GitHub Stats">
-    </picture>
-  </a>
-  <a href="https://github.com/Hitheshkaranth">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats.vercel.app/api/top-langs/?username=Hitheshkaranth&layout=compact&theme=transparent&title_color=2997FF&text_color=F5F5F7&hide_border=true">
-      <img height="180" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Hitheshkaranth&layout=compact&theme=transparent&title_color=0071E3&text_color=1D1D1F&hide_border=true" alt="Top Languages">
+      <source media="(prefers-color-scheme: dark)" srcset="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=Hitheshkaranth&theme=github_dark">
+      <img width="100%" src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=Hitheshkaranth&theme=github" alt="Hithesh Karanth's GitHub contribution history over the last year">
     </picture>
   </a>
 </p>

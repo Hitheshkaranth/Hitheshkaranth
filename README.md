@@ -31,6 +31,24 @@ A voice-first assistant for technicians navigating complex electrical schematics
 </tr>
 </table>
 
+## Building now
+
+<table>
+<tr>
+<td width="112" align="center"><a href="https://github.com/Hitheshkaranth/noyce-ide-dist"><img src="./assets/noyce-ide.png" width="82" alt="Noyce IDE logo"></a></td>
+<td>
+<h3><a href="https://github.com/Hitheshkaranth/noyce-ide-dist">Noyce IDE</a></h3>
+<img src="https://img.shields.io/badge/product-proprietary-30363d?style=flat-square" alt="Noyce IDE is proprietary software">
+<img src="https://img.shields.io/badge/status-active_development-238636?style=flat-square" alt="Noyce IDE is in active development">
+<img src="https://img.shields.io/badge/focus-safety--critical_firmware-8250df?style=flat-square" alt="Noyce IDE focuses on safety-critical firmware">
+<a href="https://gdg.community.dev/gdg-stanford/"><img src="https://img.shields.io/badge/showcased_at-Stanford_%C3%97_DeepMind_Hackathon-4285F4?style=flat-square&logo=google&logoColor=white" alt="Noyce IDE was showcased at the Stanford and DeepMind Hackathon"></a>
+<br><br>
+An AI-native Code-OSS workbench for safety-critical firmware. It brings DO-178C evidence, MISRA analysis, CBMC, CodeQL, measured MC/DC, traceability, and hardware tooling into one environment, with compliance runs that record exactly what was measured.
+<br><br><code>Code-OSS</code> <code>Firmware</code> <code>AI agents</code> <code>Verification</code>
+</td>
+</tr>
+</table>
+
 ## Open-source work
 
 <table>
@@ -60,15 +78,15 @@ A lightweight, local-first desktop monitor for Claude, Codex, Gemini, and other 
 </tr>
 
 <tr>
-<td width="112" align="center"><a href="https://github.com/Hitheshkaranth/noyce-ide-dist"><img src="./assets/noyce-ide.png" width="82" alt="Noyce IDE logo"></a></td>
+<td width="112" align="center"><a href="https://github.com/Hitheshkaranth/EmbeddedDisplayStudio"><img src="./assets/embedded-display-studio.png" width="88" alt="EmbeddedDisplayStudio logo"></a></td>
 <td>
-<h3><a href="https://github.com/Hitheshkaranth/noyce-ide-dist">Noyce IDE</a> · Building now</h3>
-<img src="https://img.shields.io/badge/status-active_development-238636?style=flat-square" alt="Noyce IDE is in active development">
-<img src="https://img.shields.io/badge/focus-safety--critical_firmware-8250df?style=flat-square" alt="Noyce IDE focuses on safety-critical firmware">
-<a href="https://gdg.community.dev/gdg-stanford/"><img src="https://img.shields.io/badge/showcased_at-Stanford_%C3%97_DeepMind_Hackathon-4285F4?style=flat-square&logo=google&logoColor=white" alt="Noyce IDE was showcased at the Stanford and DeepMind Hackathon"></a>
+<h3><a href="https://github.com/Hitheshkaranth/EmbeddedDisplayStudio">EmbeddedDisplayStudio</a></h3>
+<a href="https://github.com/Hitheshkaranth/EmbeddedDisplayStudio/stargazers"><img src="https://img.shields.io/github/stars/Hitheshkaranth/EmbeddedDisplayStudio?style=flat-square&logo=github&label=stars" alt="EmbeddedDisplayStudio stars"></a>
+<img src="https://img.shields.io/github/languages/top/Hitheshkaranth/EmbeddedDisplayStudio?style=flat-square" alt="EmbeddedDisplayStudio primary language">
+<a href="https://github.com/Hitheshkaranth/EmbeddedDisplayStudio/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-0969da?style=flat-square" alt="EmbeddedDisplayStudio MIT license"></a>
 <br><br>
-An AI-native Code-OSS workbench for safety-critical firmware. It brings DO-178C evidence, MISRA analysis, CBMC, CodeQL, measured MC/DC, traceability, and hardware tooling into one environment, with compliance runs that record exactly what was measured.
-<br><br><code>Code-OSS</code> <code>Firmware</code> <code>AI agents</code> <code>Verification</code>
+An HMI platform for embedded Linux panels. The desktop Studio previews Qt applications at exact target-panel geometry, deploys them over SSH, performs health checks, and automatically rolls back failed installations. It ships as a single Windows executable with no Python installation required.
+<br><br><code>Python</code> <code>Qt</code> <code>Embedded Linux</code> <code>SSH</code>
 </td>
 </tr>
 </table>
@@ -77,7 +95,6 @@ An AI-native Code-OSS workbench for safety-critical firmware. It brings DO-178C 
 
 | Repository | What it does | Core technology |
 | --- | --- | --- |
-| [EmbeddedDisplayStudio](https://github.com/Hitheshkaranth/EmbeddedDisplayStudio) | Previews Qt apps at real panel geometry, deploys them to embedded Linux over SSH, checks health, and rolls back failed installs. | Python · Qt · Embedded Linux |
 | [ARINC 615A CLI Tool Suite](https://github.com/Hitheshkaranth/arinc-615a-cli-tool-suite) | Implements avionics software upload and download workflows over Ethernet, including ARINC 665 media-set management. | C++23 · TFTP · Avionics |
 | [NETRA System Debugger](https://github.com/Hitheshkaranth/Netra_System_Debugger_V1) | Turns wearable-sensor telemetry into a live PySide6 debugger and 3D digital twin. | Python · PySide6 · Telemetry |
 | [NETRA Device Firmware](https://github.com/Hitheshkaranth/Netra_Device_Firmware_V1) | Captures ultrasonic ranging and MPU6050 motion telemetry on ESP32-C6 hardware. | ESP32-C6 · Firmware · Sensors |

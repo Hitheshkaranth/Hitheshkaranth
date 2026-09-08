@@ -1,78 +1,120 @@
 <div align="center">
 
-# Hi, I'm Hithesh Karanth 👋
+# Hithesh Karanth
 
-### I build open-source tools for markets, AI-native development, and embedded systems.
+**CTO at [FlyVI Technologies](https://www.flyvitech.com/) · Open-source systems builder**
 
-[![GitHub followers](https://img.shields.io/github/followers/Hitheshkaranth?style=flat-square&logo=github&label=Followers&color=181717)](https://github.com/Hitheshkaranth?tab=followers)
-[![Profile views](https://komarev.com/ghpvc/?username=Hitheshkaranth&style=flat-square&color=0e75b6)](https://github.com/Hitheshkaranth)
+Building across aerospace, financial platforms, AI-native development, and embedded software.
+
+[![GitHub followers](https://img.shields.io/github/followers/Hitheshkaranth?style=flat-square&logo=github&label=Followers&color=0969da)](https://github.com/Hitheshkaranth?tab=followers)
+[![OpenTerminalUI stars](https://img.shields.io/github/stars/Hitheshkaranth/OpenTerminalUI?style=flat-square&logo=github&label=OpenTerminalUI&color=d29922)](https://github.com/Hitheshkaranth/OpenTerminalUI/stargazers)
+[![Profile views](https://komarev.com/ghpvc/?username=Hitheshkaranth&style=flat-square&color=1f6feb)](https://github.com/Hitheshkaranth)
+
+🏆 **Winner, Sarvam Epoch Buildathon 2026**
 
 </div>
 
-I enjoy turning complex, specialist workflows into software that feels focused and approachable—from a self-hosted financial terminal to local-first AI usage monitoring and tooling for safety-critical firmware.
+As CTO at FlyVI Technologies, I work on high-reliability aerospace, defence, power-electronics, and embedded-control systems. In open source, I build tools that make complicated systems easier to inspect, operate, and trust, from financial research and AI usage monitoring to avionics tooling and verifiable firmware development.
 
-My work sits at the intersection of **full-stack engineering**, **developer tools**, **quantitative systems**, and **embedded software**. I care about useful abstractions, honest measurements, privacy-first architecture, and software people can run on their own hardware.
+> **Currently building:** [Noyce IDE](https://github.com/Hitheshkaranth/noyce-ide-dist), an AI-native Code-OSS workbench for safety-critical firmware.
 
-## Featured open-source work
+## Award-winning work
 
-### [OpenTerminalUI](https://github.com/Hitheshkaranth/OpenTerminalUI)
+<table>
+<tr>
+<td width="112" align="center"><img src="./assets/wirevoice.png" width="88" alt="WireVoice logo"></td>
+<td>
+<strong>WireVoice · Sarvam Epoch Buildathon Winner</strong><br><br>
+A voice-first assistant for technicians navigating complex electrical schematics. WireVoice uses Sarvam Voice AI to locate terminals, wires, and connections, answer in the technician's preferred language, and cite the exact schematic sheet as its source.<br><br>
+<a href="https://www.linkedin.com/posts/vinayakgavariya_buildwithsarvam-activity-7493728077878001664-BYc-"><strong>Read the winner announcement →</strong></a>
+</td>
+</tr>
+</table>
 
-[![Stars](https://img.shields.io/github/stars/Hitheshkaranth/OpenTerminalUI?style=flat-square&logo=github&label=Stars)](https://github.com/Hitheshkaranth/OpenTerminalUI/stargazers)
-[![Forks](https://img.shields.io/github/forks/Hitheshkaranth/OpenTerminalUI?style=flat-square&logo=github&label=Forks)](https://github.com/Hitheshkaranth/OpenTerminalUI/forks)
-[![License](https://img.shields.io/github/license/Hitheshkaranth/OpenTerminalUI?style=flat-square)](https://github.com/Hitheshkaranth/OpenTerminalUI/blob/main/LICENSE)
+## Open-source work
 
-An open-source, self-hosted financial terminal for traders, researchers, and quant teams. It brings market data, institutional-style charting, derivatives analytics, portfolio workflows, backtesting, and AI-assisted research into one browser-based workspace.
+<table>
+<tr>
+<td width="112" align="center"><a href="https://github.com/Hitheshkaranth/OpenTerminalUI"><img src="./assets/openterminalui.png" width="88" alt="OpenTerminalUI logo"></a></td>
+<td>
+<h3><a href="https://github.com/Hitheshkaranth/OpenTerminalUI">OpenTerminalUI</a></h3>
+<a href="https://github.com/Hitheshkaranth/OpenTerminalUI/stargazers"><img src="https://img.shields.io/github/stars/Hitheshkaranth/OpenTerminalUI?style=flat-square&logo=github&label=stars" alt="OpenTerminalUI stars"></a>
+<a href="https://github.com/Hitheshkaranth/OpenTerminalUI/forks"><img src="https://img.shields.io/github/forks/Hitheshkaranth/OpenTerminalUI?style=flat-square&logo=github&label=forks" alt="OpenTerminalUI forks"></a>
+<a href="https://github.com/Hitheshkaranth/OpenTerminalUI/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Hitheshkaranth/OpenTerminalUI?style=flat-square" alt="OpenTerminalUI license"></a>
+<br><br>
+A self-hosted financial terminal for traders, researchers, and quant teams. It combines multi-market data, professional charting, derivatives analytics, portfolio and risk workflows, backtesting, paper trading, and tool-using AI research in one browser workspace.
+<br><br><code>TypeScript</code> <code>Python</code> <code>FastAPI</code> <code>React</code> <code>Docker</code>
+</td>
+</tr>
 
-`TypeScript` · `Python` · `FastAPI` · `React` · `Docker` · `Quant research`
+<tr>
+<td width="112" align="center"><a href="https://github.com/Hitheshkaranth/OpenTokenMonitor"><img src="./assets/opentokenmonitor.png" width="88" alt="OpenTokenMonitor logo"></a></td>
+<td>
+<h3><a href="https://github.com/Hitheshkaranth/OpenTokenMonitor">OpenTokenMonitor</a></h3>
+<a href="https://github.com/Hitheshkaranth/OpenTokenMonitor/stargazers"><img src="https://img.shields.io/github/stars/Hitheshkaranth/OpenTokenMonitor?style=flat-square&logo=github&label=stars" alt="OpenTokenMonitor stars"></a>
+<img src="https://img.shields.io/github/languages/top/Hitheshkaranth/OpenTokenMonitor?style=flat-square" alt="OpenTokenMonitor primary language">
+<br><br>
+A lightweight, local-first desktop monitor for Claude, Codex, Gemini, and other AI coding tools. It puts usage, quota windows, activity trends, and cost signals into one privacy-first widget instead of scattering them across provider dashboards.
+<br><br><code>Rust</code> <code>Tauri</code> <code>Desktop</code> <code>Local-first</code>
+</td>
+</tr>
 
-[Explore the project →](https://github.com/Hitheshkaranth/OpenTerminalUI)
+<tr>
+<td width="112" align="center"><a href="https://github.com/Hitheshkaranth/noyce-ide-dist"><img src="./assets/noyce-ide.png" width="82" alt="Noyce IDE logo"></a></td>
+<td>
+<h3><a href="https://github.com/Hitheshkaranth/noyce-ide-dist">Noyce IDE</a> · Building now</h3>
+<img src="https://img.shields.io/badge/status-active_development-238636?style=flat-square" alt="Noyce IDE is in active development">
+<img src="https://img.shields.io/badge/focus-safety--critical_firmware-8250df?style=flat-square" alt="Noyce IDE focuses on safety-critical firmware">
+<br><br>
+An AI-native Code-OSS workbench for safety-critical firmware. It brings DO-178C evidence, MISRA analysis, CBMC, CodeQL, measured MC/DC, traceability, and hardware tooling into one environment, with compliance runs that record exactly what was measured.
+<br><br><code>Code-OSS</code> <code>Firmware</code> <code>AI agents</code> <code>Verification</code>
+</td>
+</tr>
+</table>
 
----
+### More public projects
 
-### [OpenTokenMonitor](https://github.com/Hitheshkaranth/OpenTokenMonitor)
-
-[![Stars](https://img.shields.io/github/stars/Hitheshkaranth/OpenTokenMonitor?style=flat-square&logo=github&label=Stars)](https://github.com/Hitheshkaranth/OpenTokenMonitor/stargazers)
-[![Rust](https://img.shields.io/github/languages/top/Hitheshkaranth/OpenTokenMonitor?style=flat-square)](https://github.com/Hitheshkaranth/OpenTokenMonitor)
-
-A lightweight, local-first desktop widget for monitoring activity, usage trends, and costs across AI coding tools such as Claude, Codex, and Gemini.
-
-`Rust` · `Desktop tooling` · `Local-first` · `AI developer experience`
-
-[Explore the project →](https://github.com/Hitheshkaranth/OpenTokenMonitor)
-
-## More projects
-
-| Project | What it does | Focus |
+| Repository | What it does | Core technology |
 | --- | --- | --- |
-| [Noyce IDE](https://github.com/Hitheshkaranth/noyce-ide-dist) | AI-native Code-OSS workbench for safety-critical firmware and verifiable compliance workflows | Developer tools · Firmware · AI |
-| [Embedded Display Studio](https://github.com/Hitheshkaranth/EmbeddedDisplayStudio) | Builds, previews, deploys, health-checks, and safely rolls back Qt applications for embedded Linux panels | Python · Qt · Embedded Linux |
-| [ARINC 615A CLI Tool Suite](https://github.com/Hitheshkaranth/arinc-615a-cli-tool-suite) | Implements avionics software upload/download workflows over Ethernet | C++23 · Avionics · TFTP |
-| [NETRA System Debugger](https://github.com/Hitheshkaranth/Netra_System_Debugger_V1) | Visualizes wearable-sensor telemetry through a live 3D digital twin | Python · PySide6 · Telemetry |
+| [EmbeddedDisplayStudio](https://github.com/Hitheshkaranth/EmbeddedDisplayStudio) | Previews Qt apps at real panel geometry, deploys them to embedded Linux over SSH, checks health, and rolls back failed installs. | Python · Qt · Embedded Linux |
+| [ARINC 615A CLI Tool Suite](https://github.com/Hitheshkaranth/arinc-615a-cli-tool-suite) | Implements avionics software upload and download workflows over Ethernet, including ARINC 665 media-set management. | C++23 · TFTP · Avionics |
+| [NETRA System Debugger](https://github.com/Hitheshkaranth/Netra_System_Debugger_V1) | Turns wearable-sensor telemetry into a live PySide6 debugger and 3D digital twin. | Python · PySide6 · Telemetry |
+| [NETRA Device Firmware](https://github.com/Hitheshkaranth/Netra_Device_Firmware_V1) | Captures ultrasonic ranging and MPU6050 motion telemetry on ESP32-C6 hardware. | ESP32-C6 · Firmware · Sensors |
 
-## What I work with
+## Contribution history
 
-```text
-Languages        TypeScript · Python · Rust · C++ · C
-Applications     React · FastAPI · Qt · Tauri · Code-OSS
-Systems          Docker · Linux · Embedded devices · Real-time telemetry
-Domains          Financial systems · AI tooling · Avionics · Developer experience
-```
+<p align="center">
+<a href="https://github.com/Hitheshkaranth?tab=overview">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=Hitheshkaranth&theme=github_dark">
+<img width="100%" src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=Hitheshkaranth&theme=github" alt="Hithesh Karanth's GitHub contribution history over the last year">
+</picture>
+</a>
+</p>
 
-## Current interests
+## Open-source star growth
 
-- Building capable, self-hosted alternatives to closed specialist software
-- Designing AI-assisted workflows that remain inspectable and measurable
-- Making embedded and safety-critical development easier to test and reason about
-- Contributing practical tools, clear documentation, and reproducible builds to open source
+<p align="center">
+<a href="https://www.star-history.com/#Hitheshkaranth/OpenTerminalUI&Hitheshkaranth/OpenTokenMonitor&Date">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor&type=Date&theme=dark">
+<img width="100%" src="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor&type=Date&theme=light" alt="Star history for OpenTerminalUI and OpenTokenMonitor">
+</picture>
+</a>
+</p>
 
-## Let's connect
+## Tools I build with
 
-If you are working on open-source developer tools, market infrastructure, AI-native software, or embedded systems, I would be glad to compare notes or collaborate.
+<p align="center">
+<img src="https://skillicons.dev/icons?i=ts,python,rust,cpp,react,fastapi,docker,tauri,qt,linux&perline=10" alt="TypeScript, Python, Rust, C++, React, FastAPI, Docker, Tauri, Qt, and Linux">
+</p>
 
-[![GitHub](https://img.shields.io/badge/GitHub-Hitheshkaranth-181717?style=for-the-badge&logo=github)](https://github.com/Hitheshkaranth)
+My recurring interests are self-hosted specialist software, inspectable AI workflows, quantitative systems, embedded devices, and engineering tools that produce evidence instead of vague confidence.
 
-<div align="center">
+## Work with me
 
-<sub>Build useful things. Measure honestly. Share what works.</sub>
+I am always interested in serious open-source collaboration around developer tools, financial infrastructure, applied voice AI, avionics, and embedded systems.
 
-</div>
+<p align="center">
+<a href="https://github.com/Hitheshkaranth"><img src="https://img.shields.io/badge/Follow_on_GitHub-181717?style=for-the-badge&logo=github" alt="Follow Hitheshkaranth on GitHub"></a>
+</p>

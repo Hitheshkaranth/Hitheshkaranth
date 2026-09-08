@@ -1,8 +1,5 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/profile-header-dark.svg">
-    <img src="./assets/profile-header-light.svg" width="100%" alt="Hithesh Karanth, CTO at FlyVI Technologies, working across aerospace, embedded systems, developer tools, and open source">
-  </picture>
+  <img src="./assets/profile-header.gif" width="100%" alt="Hithesh Karanth, CTO at FlyVI Technologies, working across aerospace, embedded systems, developer tools, and open source">
 </p>
 
 <p align="center">

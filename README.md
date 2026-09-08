@@ -16,7 +16,7 @@ Building across aerospace, financial platforms, AI-native development, and embed
 
 As CTO at FlyVI Technologies, I work on high-reliability aerospace, defence, power-electronics, and embedded-control systems. In open source, I build tools that make complicated systems easier to inspect, operate, and trust, from financial research and AI usage monitoring to avionics tooling and verifiable firmware development.
 
-> **Currently building:** [Noyce IDE](https://github.com/Hitheshkaranth/noyce-ide-dist), an AI-native Code-OSS workbench for safety-critical firmware.
+> **Currently building:** [Noyce IDE](https://github.com/Hitheshkaranth/noyce-ide-dist), an AI-native Code-OSS workbench for safety-critical firmware, showcased at the [Stanford × DeepMind Hackathon](https://gdg.community.dev/gdg-stanford/).
 
 ## Award-winning work
 
@@ -65,6 +65,7 @@ A lightweight, local-first desktop monitor for Claude, Codex, Gemini, and other 
 <h3><a href="https://github.com/Hitheshkaranth/noyce-ide-dist">Noyce IDE</a> · Building now</h3>
 <img src="https://img.shields.io/badge/status-active_development-238636?style=flat-square" alt="Noyce IDE is in active development">
 <img src="https://img.shields.io/badge/focus-safety--critical_firmware-8250df?style=flat-square" alt="Noyce IDE focuses on safety-critical firmware">
+<a href="https://gdg.community.dev/gdg-stanford/"><img src="https://img.shields.io/badge/showcased_at-Stanford_%C3%97_DeepMind_Hackathon-4285F4?style=flat-square&logo=google&logoColor=white" alt="Noyce IDE was showcased at the Stanford and DeepMind Hackathon"></a>
 <br><br>
 An AI-native Code-OSS workbench for safety-critical firmware. It brings DO-178C evidence, MISRA analysis, CBMC, CodeQL, measured MC/DC, traceability, and hardware tooling into one environment, with compliance runs that record exactly what was measured.
 <br><br><code>Code-OSS</code> <code>Firmware</code> <code>AI agents</code> <code>Verification</code>

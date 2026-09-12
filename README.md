@@ -198,10 +198,10 @@ I lead technology at [FlyVI Technologies](https://www.flyvitech.com/), where I w
 </p>
 
 <p align="center">
-  <a href="https://www.star-history.com/#Hitheshkaranth/OpenTerminalUI&Hitheshkaranth/OpenTokenMonitor&Date">
+  <a href="https://www.star-history.com/#Hitheshkaranth/OpenTerminalUI&Hitheshkaranth/OpenTokenMonitor&Hitheshkaranth/EmbeddedDisplayStudio&Date">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor&type=Date&theme=dark">
-      <img width="100%" src="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor&type=Date&theme=light" alt="Star history for OpenTerminalUI and OpenTokenMonitor">
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio&type=Date&theme=dark&v=20260913">
+      <img width="100%" src="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio&type=Date&theme=light&v=20260913" alt="Star history for OpenTerminalUI, OpenTokenMonitor, and EmbeddedDisplayStudio">
     </picture>
   </a>
 </p>

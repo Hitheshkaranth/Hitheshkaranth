@@ -219,8 +219,8 @@ Open-source, reproducible recipes for serving 35B-parameter Mixture-of-Experts m
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/dgx-spark-inference-dark.svg">
-    <img src="./assets/dgx-spark-inference-light.svg" width="100%" alt="Three DGX Spark inference deployments: Ornith-1.5 at 82.7 tok/s single-user decode with MTP and 351.7 tok/s aggregate across 16 users, Qwen3.8 Distill at 373 tok/s aggregate across 16 users, Qwen3.6 at 219 tok/s peak, all with 262K context">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/dgx-spark-inference-v2-dark.svg">
+    <img src="./assets/dgx-spark-inference-v2-light.svg" width="100%" alt="Three DGX Spark inference deployments: Ornith-1.5 at 82.7 tok/s for one user and 351.7 tok/s aggregate across 16 users, Qwen3.8 Distill at 373 tok/s aggregate across 16 users, Qwen3.6 at 219 tok/s peak, all with 262K context">
   </picture>
 </p>
 

@@ -7,13 +7,10 @@
 <text x="64" y="176" font-size="19" font-weight="700" fill="#1f2328">Ornith-1.5</text>
 <rect x="322" y="158" width="56" height="24" rx="12" fill="#eaf5dc"/><circle cx="336" cy="170" r="4" fill="#1a7f37"/><text x="345" y="175" font-size="12" font-weight="700" fill="#1a7f37">LIVE</text>
 <text x="64" y="198" font-size="13" fill="#59636e">35B-A3B · NVFP4 + FP8 + MTP</text>
-<text x="64" y="252" font-size="44" font-weight="800" fill="#4d8c00">82.7</text>
-<text x="64" y="274" font-size="13" fill="#59636e">tok/s, 1 user</text>
-<line x1="186" y1="214" x2="186" y2="278" stroke="#d0d7de"/>
-<text x="206" y="252" font-size="44" font-weight="800" fill="#4d8c00">351.7</text>
-<text x="206" y="274" font-size="13" fill="#59636e">tok/s aggregate, 16 users</text>
+<text x="64" y="252" font-size="44" font-weight="800" fill="#4d8c00">351.7</text>
+<text x="64" y="274" font-size="13" fill="#59636e">tok/s aggregate, 16 users</text>
 <text x="64" y="312" font-size="13" fill="#1f2328">Up to 20 concurrent users  ·  MTP acceptance ~87%</text>
-<text x="64" y="330" font-size="13" fill="#1f2328">Vision input  ·  +47% single-user decode via MTP</text>
+<text x="64" y="330" font-size="13" fill="#1f2328">Vision input  ·  262K context</text>
 <rect x="420" y="140" width="360" height="200" rx="12" fill="#f6f8fa" stroke="#d0d7de"/>
 <text x="444" y="176" font-size="19" font-weight="700" fill="#1f2328">Qwen3.8 Distill</text>
 <text x="444" y="198" font-size="13" fill="#59636e">35B-A3B · self-quantized NVFP4</text>

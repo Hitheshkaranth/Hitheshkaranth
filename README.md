@@ -9,11 +9,11 @@
   &nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="#building-now">Noyce IDE</a>
   &nbsp;&nbsp;·&nbsp;&nbsp;
-  <a href="#mlops--inference-on-dgx-spark">MLOps</a>
-  &nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="#open-source">Open Source</a>
   &nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="#selected-systems-work">Systems Work</a>
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="#mlops--inference-on-dgx-spark">MLOps</a>
   &nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="#contact">Contact</a>
 </p>
@@ -60,55 +60,6 @@ I lead technology at [FlyVI Technologies](https://www.flyvitech.com/), where I w
   <h3><a href="https://github.com/Hitheshkaranth/noyce-ide-dist">Noyce IDE</a> &nbsp;<sub><code>Proprietary</code>&nbsp;<code>Active development</code></sub></h3>
   <p>An AI-native Code-OSS workbench for safety-critical firmware. Noyce connects requirements, source code, tests, traceability, MISRA analysis, CBMC, CodeQL, measured MC/DC, and hardware tooling in one environment — so a firmware team can see, prove, and ship from a single place.</p>
   <p>🎓&nbsp; Showcased at the <a href="https://gdg.community.dev/gdg-stanford/">Stanford × DeepMind Hackathon</a></p>
-</td>
-</tr>
-</table>
-
-## MLOps · Inference on DGX Spark
-
-Open-source, reproducible recipes for serving 35B-parameter Mixture-of-Experts models on a single **NVIDIA DGX Spark (GB10, 128 GB unified memory)** — quantization, vLLM serving, a per-user metering gateway, and Prometheus/Grafana observability. Every benchmark in these repos was measured on the running deployment.
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/dgx-spark-inference-dark.svg">
-    <img src="./assets/dgx-spark-inference-light.svg" width="100%" alt="Three DGX Spark inference deployments: Ornith-1.5 at 82.7 tok/s single-user decode with MTP and 351.7 tok/s aggregate across 16 users, Qwen3.8 Distill at 373 tok/s aggregate across 16 users, Qwen3.6 at 219 tok/s peak, all with 262K context">
-  </picture>
-</p>
-
-<table width="100%">
-<tr>
-<td valign="top">
-  <h3><a href="https://github.com/Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup">Ornith-1.5-35B-A3B</a> &nbsp;<sub><code>Live</code>&nbsp;<code>NVFP4 + FP8 + MTP</code></sub></h3>
-  <p>Serves the official 4-bit Ornith-1.5 checkpoint with multi-token-prediction speculative decoding (~87% draft acceptance, +47% single-user decode) and a real vision tower for image input — 82.7 tok/s for a single user, 351.7 tok/s aggregate across 16 users, and up to 20 concurrent users at 262K context.</p>
-  <p>
-    <a href="https://github.com/Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup/stargazers"><img src="https://img.shields.io/github/stars/Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup?style=flat-square&logo=github&label=Stars&color=6e6e73" alt="Ornith-1.5-35B-A3B stars"></a>
-    <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%202.0-6e6e73?style=flat-square" alt="Apache 2.0 licensed"></a>
-    &nbsp;<sub>vLLM 0.24 · MTP · Vision · MMLU-Pro</sub>
-  </p>
-</td>
-</tr>
-
-<tr>
-<td valign="top">
-  <h3><a href="https://github.com/Hitheshkaranth/Qwen-3_8_A3B_Model_DGX_Spark_Setup">Qwen3.8-35B-A3B Distill</a> &nbsp;<sub><code>Self-quantized</code></sub></h3>
-  <p>A data-free NVFP4-experts + FP8-attention quantization pipeline that streams one shard at a time (~20 min, a few GB of RAM), working around two quantizer bugs — then serves 16 concurrent users at 373 tok/s aggregate.</p>
-  <p>
-    <a href="https://github.com/Hitheshkaranth/Qwen-3_8_A3B_Model_DGX_Spark_Setup/stargazers"><img src="https://img.shields.io/github/stars/Hitheshkaranth/Qwen-3_8_A3B_Model_DGX_Spark_Setup?style=flat-square&logo=github&label=Stars&color=6e6e73" alt="Qwen3.8-35B-A3B Distill stars"></a>
-    <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%202.0-6e6e73?style=flat-square" alt="Apache 2.0 licensed"></a>
-    &nbsp;<sub>ModelOpt · NVFP4 · vLLM · Tailscale gateway</sub>
-  </p>
-</td>
-</tr>
-
-<tr>
-<td valign="top">
-  <h3><a href="https://github.com/Hitheshkaranth/Qwen-3_6_Model_DGX_Spark_Setup">Qwen3.6-35B-A3B-NVFP4</a> &nbsp;<sub><code>Production recipe</code></sub></h3>
-  <p>The one-script production deployment of NVIDIA's NVFP4 Qwen3.6: 12 concurrent users, 219 tok/s peak output, and prefix caching that makes shared-prompt sessions 5.1× faster — with the Prometheus + Grafana + DCGM stack included.</p>
-  <p>
-    <a href="https://github.com/Hitheshkaranth/Qwen-3_6_Model_DGX_Spark_Setup/stargazers"><img src="https://img.shields.io/github/stars/Hitheshkaranth/Qwen-3_6_Model_DGX_Spark_Setup?style=flat-square&logo=github&label=Stars&color=6e6e73" alt="Qwen3.6-35B-A3B-NVFP4 stars"></a>
-    <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%202.0-6e6e73?style=flat-square" alt="Apache 2.0 licensed"></a>
-    &nbsp;<sub>vLLM · Prefix caching · Prometheus · Grafana · DCGM</sub>
-  </p>
 </td>
 </tr>
 </table>
@@ -261,6 +212,64 @@ Open-source, reproducible recipes for serving 35B-parameter Mixture-of-Experts m
     </picture>
   </a>
 </p>
+
+## MLOps · Inference on DGX Spark
+
+Open-source, reproducible recipes for serving 35B-parameter Mixture-of-Experts models on a single **NVIDIA DGX Spark (GB10, 128 GB unified memory)** — quantization, vLLM serving, a per-user metering gateway, and Prometheus/Grafana observability. Every benchmark in these repos was measured on the running deployment.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/dgx-spark-inference-dark.svg">
+    <img src="./assets/dgx-spark-inference-light.svg" width="100%" alt="Three DGX Spark inference deployments: Ornith-1.5 at 82.7 tok/s single-user decode with MTP and 351.7 tok/s aggregate across 16 users, Qwen3.8 Distill at 373 tok/s aggregate across 16 users, Qwen3.6 at 219 tok/s peak, all with 262K context">
+  </picture>
+</p>
+
+<table width="100%">
+<tr>
+<td width="140" align="center" valign="middle">
+  <a href="https://github.com/Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup"><img src="./assets/ornith.png" width="96" alt="Ornith logo"></a>
+</td>
+<td valign="middle">
+  <h3><a href="https://github.com/Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup">Ornith-1.5-35B-A3B</a> &nbsp;<sub><code>Live</code>&nbsp;<code>NVFP4 + FP8 + MTP</code></sub></h3>
+  <p>Serves the official 4-bit Ornith-1.5 checkpoint with multi-token-prediction speculative decoding (~87% draft acceptance, +47% single-user decode) and a real vision tower for image input — 82.7 tok/s for a single user, 351.7 tok/s aggregate across 16 users, and up to 20 concurrent users at 262K context.</p>
+  <p>
+    <a href="https://github.com/Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup/stargazers"><img src="https://img.shields.io/github/stars/Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup?style=flat-square&logo=github&label=Stars&color=6e6e73" alt="Ornith-1.5-35B-A3B stars"></a>
+    <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%202.0-6e6e73?style=flat-square" alt="Apache 2.0 licensed"></a>
+    &nbsp;<sub>vLLM 0.24 · MTP · Vision · MMLU-Pro</sub>
+  </p>
+</td>
+</tr>
+
+<tr>
+<td width="140" align="center" valign="middle">
+  <a href="https://github.com/Hitheshkaranth/Qwen-3_8_A3B_Model_DGX_Spark_Setup"><img src="./assets/qwen.png" width="96" alt="Qwen logo"></a>
+</td>
+<td valign="middle">
+  <h3><a href="https://github.com/Hitheshkaranth/Qwen-3_8_A3B_Model_DGX_Spark_Setup">Qwen3.8-35B-A3B Distill</a> &nbsp;<sub><code>Self-quantized</code></sub></h3>
+  <p>A data-free NVFP4-experts + FP8-attention quantization pipeline that streams one shard at a time (~20 min, a few GB of RAM), working around two quantizer bugs — then serves 16 concurrent users at 373 tok/s aggregate.</p>
+  <p>
+    <a href="https://github.com/Hitheshkaranth/Qwen-3_8_A3B_Model_DGX_Spark_Setup/stargazers"><img src="https://img.shields.io/github/stars/Hitheshkaranth/Qwen-3_8_A3B_Model_DGX_Spark_Setup?style=flat-square&logo=github&label=Stars&color=6e6e73" alt="Qwen3.8-35B-A3B Distill stars"></a>
+    <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%202.0-6e6e73?style=flat-square" alt="Apache 2.0 licensed"></a>
+    &nbsp;<sub>ModelOpt · NVFP4 · vLLM · Tailscale gateway</sub>
+  </p>
+</td>
+</tr>
+
+<tr>
+<td width="140" align="center" valign="middle">
+  <a href="https://github.com/Hitheshkaranth/Qwen-3_6_Model_DGX_Spark_Setup"><img src="./assets/qwen.png" width="96" alt="Qwen logo"></a>
+</td>
+<td valign="middle">
+  <h3><a href="https://github.com/Hitheshkaranth/Qwen-3_6_Model_DGX_Spark_Setup">Qwen3.6-35B-A3B-NVFP4</a> &nbsp;<sub><code>Production recipe</code></sub></h3>
+  <p>The one-script production deployment of NVIDIA's NVFP4 Qwen3.6: 12 concurrent users, 219 tok/s peak output, and prefix caching that makes shared-prompt sessions 5.1× faster — with the Prometheus + Grafana + DCGM stack included.</p>
+  <p>
+    <a href="https://github.com/Hitheshkaranth/Qwen-3_6_Model_DGX_Spark_Setup/stargazers"><img src="https://img.shields.io/github/stars/Hitheshkaranth/Qwen-3_6_Model_DGX_Spark_Setup?style=flat-square&logo=github&label=Stars&color=6e6e73" alt="Qwen3.6-35B-A3B-NVFP4 stars"></a>
+    <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%202.0-6e6e73?style=flat-square" alt="Apache 2.0 licensed"></a>
+    &nbsp;<sub>vLLM · Prefix caching · Prometheus · Grafana · DCGM</sub>
+  </p>
+</td>
+</tr>
+</table>
 
 ## Contact
 

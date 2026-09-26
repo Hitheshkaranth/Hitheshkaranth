@@ -9,8 +9,8 @@
 <text x="64" y="198" font-size="13" fill="#59636e">35B-A3B · NVFP4 + FP8 + MTP</text>
 <text x="64" y="252" font-size="44" font-weight="800" fill="#4d8c00">82.7</text>
 <text x="64" y="274" font-size="13" fill="#59636e">tok/s single-user decode</text>
-<text x="64" y="312" font-size="13" fill="#1f2328">20 concurrent users  ·  MTP draft acceptance ~87%</text>
-<text x="64" y="330" font-size="13" fill="#1f2328">Vision input</text>
+<text x="64" y="312" font-size="13" fill="#1f2328"><tspan font-weight="700" fill="#4d8c00">351.7 tok/s</tspan> aggregate, 16 users  ·  20 max</text>
+<text x="64" y="330" font-size="13" fill="#1f2328">MTP draft acceptance ~87%  ·  Vision input</text>
 <rect x="420" y="140" width="360" height="200" rx="12" fill="#f6f8fa" stroke="#d0d7de"/>
 <text x="444" y="176" font-size="19" font-weight="700" fill="#1f2328">Qwen3.8 Distill</text>
 <text x="444" y="198" font-size="13" fill="#59636e">35B-A3B · self-quantized NVFP4</text>

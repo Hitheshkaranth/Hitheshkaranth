@@ -71,7 +71,7 @@ Open-source, reproducible recipes for serving 35B-parameter Mixture-of-Experts m
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./assets/dgx-spark-inference-dark.svg">
-    <img src="./assets/dgx-spark-inference-light.svg" width="100%" alt="Three DGX Spark inference deployments: Ornith-1.5 at 82.7 tok/s single-user decode with MTP, Qwen3.8 Distill at 373 tok/s aggregate across 16 users, Qwen3.6 at 219 tok/s peak, all with 262K context">
+    <img src="./assets/dgx-spark-inference-light.svg" width="100%" alt="Three DGX Spark inference deployments: Ornith-1.5 at 82.7 tok/s single-user decode with MTP and 351.7 tok/s aggregate across 16 users, Qwen3.8 Distill at 373 tok/s aggregate across 16 users, Qwen3.6 at 219 tok/s peak, all with 262K context">
   </picture>
 </p>
 
@@ -79,7 +79,7 @@ Open-source, reproducible recipes for serving 35B-parameter Mixture-of-Experts m
 <tr>
 <td valign="top">
   <h3><a href="https://github.com/Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup">Ornith-1.5-35B-A3B</a> &nbsp;<sub><code>Live</code>&nbsp;<code>NVFP4 + FP8 + MTP</code></sub></h3>
-  <p>Serves the official 4-bit Ornith-1.5 checkpoint with multi-token-prediction speculative decoding (~87% draft acceptance, +47% single-user decode) and a real vision tower for image input — 20 concurrent users at 262K context.</p>
+  <p>Serves the official 4-bit Ornith-1.5 checkpoint with multi-token-prediction speculative decoding (~87% draft acceptance, +47% single-user decode) and a real vision tower for image input — 82.7 tok/s for a single user, 351.7 tok/s aggregate across 16 users, and up to 20 concurrent users at 262K context.</p>
   <p>
     <a href="https://github.com/Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup/stargazers"><img src="https://img.shields.io/github/stars/Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup?style=flat-square&logo=github&label=Stars&color=6e6e73" alt="Ornith-1.5-35B-A3B stars"></a>
     <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%202.0-6e6e73?style=flat-square" alt="Apache 2.0 licensed"></a>

@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: profile
+  cancel-in-progress: false
+
 jobs:
   artwork:
     runs-on: ubuntu-latest

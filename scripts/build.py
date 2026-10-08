@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Render the profile's Apple-style SVG artwork (light + dark) into assets/gen/.
+"""Render the profile's SVG artwork (light + dark) into assets/gen/.
+
+Design language: shadcn/ui components (zinc neutrals, 1px borders, badges,
+outline buttons, Lucide icons) with Apple type, spacing and window chrome.
 
 Run locally or from the daily workflow:  python3 scripts/build.py
 Star counts are fetched from the GitHub API (GITHUB_TOKEN optional) and cached
@@ -15,19 +18,16 @@ ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "assets"
 OUT = ASSETS / "gen"
 OWNER = "Hitheshkaranth"
-FONT = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif"
-MONO = "'SF Mono', ui-monospace, Menlo, Consolas, monospace"
+FONT = "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Geist', 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif"
 
-THEMES = {
-    "light": dict(bg="#f5f5f7", card="#ffffff", line="#e5e5ea", text="#1d1d1f", sub="#6e6e73",
-                  faint="#86868b", link="#0066cc", tile="#ffffff", chrome="#ececee",
-                  chrome_line="#d2d2d7", shadow="0.10", glow="0.16"),
-    "dark":  dict(bg="#000000", card="#1c1c1e", line="#2c2c2e", text="#f5f5f7", sub="#a1a1a6",
-                  faint="#86868b", link="#2997ff", tile="#2c2c2e", chrome="#2c2c2e",
-                  chrome_line="#3a3a3c", shadow="0.55", glow="0.28"),
+THEMES = {  # shadcn/ui zinc tokens
+    "light": dict(card="#ffffff", fg="#09090b", muted="#f4f4f5", muted_fg="#71717a", border="#e4e4e7",
+                  primary="#18181b", primary_fg="#fafafa", dot="#d4d4d8", shadow="0.06",
+                  live_bg="#dcfce7", live_fg="#15803d"),
+    "dark":  dict(card="#09090b", fg="#fafafa", muted="#27272a", muted_fg="#a1a1aa", border="#27272a",
+                  primary="#fafafa", primary_fg="#18181b", dot="#27272a", shadow="0.5",
+                  live_bg="#052e16", live_fg="#4ade80"),
 }
-# Apple Intelligence-style spectrum
-SPECTRUM = ["#0a84ff", "#40c8e0", "#30d158", "#ff9f0a"]
 
 # ── data ─────────────────────────────────────────────────────────────────────
 
@@ -134,417 +134,370 @@ def wrap(text, width):
     return textwrap.wrap(text, width)
 
 
+def tw(text, size, weight=400):
+    """Rough rendered width of `text` in the system UI font."""
+    return len(text) * size * (0.55 if weight >= 600 else 0.5)
+
+
 def svg(w, h, body, defs="", style=""):
     return (f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
             f'width="{w}" height="{h}" viewBox="0 0 {w} {h}" font-family="{FONT}">'
             f'<style>{style}</style><defs>{defs}</defs>{body}</svg>\n')
 
 
-def shadow_filter(t, fid="shadow", dy=10, blur=18):
-    return (f'<filter id="{fid}" x="-20%" y="-20%" width="140%" height="160%">'
-            f'<feDropShadow dx="0" dy="{dy}" stdDeviation="{blur}" flood-color="#000" flood-opacity="{t["shadow"]}"/></filter>')
+def shadow_sm(t, fid="sm"):
+    return (f'<filter id="{fid}" x="-10%" y="-10%" width="120%" height="140%">'
+            f'<feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000" flood-opacity="{t["shadow"]}"/></filter>')
 
 
-def spectrum_gradient(gid, x2="100%", y2="0%"):
-    stops = "".join(f'<stop offset="{i / (len(SPECTRUM) - 1):.2f}" stop-color="{c}"/>' for i, c in enumerate(SPECTRUM))
-    return f'<linearGradient id="{gid}" x1="0%" y1="0%" x2="{x2}" y2="{y2}">{stops}</linearGradient>'
+# Lucide icons (ISC licensed), drawn in a 24×24 box with 2px strokes
+LUCIDE = {
+    "search": '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    "cpu": '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/>'
+           '<path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/>',
+    "code": '<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>',
+    "plane": '<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>',
+    "shield": '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+    "wrench": '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+    "sparkles": '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4M22 5h-4"/>',
+    "zap": '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+    "star": '<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>',
+    "arrow": '<path d="M5 12h14M12 5l7 7-7 7"/>',
+    "chevron": '<path d="m9 18 6-6-6-6"/>',
+    "globe": '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>',
+    "folder": '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+    "award": '<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>',
+}
+BRANDS = {  # filled marks, 24×24
+    "github": '<path transform="scale(1.5)" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>',
+    "x": '<path d="M18.9 1.2h3.7l-8 9.2 9.4 12.4h-7.4l-5.8-7.6-6.6 7.6H.5l8.6-9.8L0 1.2h7.6l5.2 6.9zm-1.3 19.4h2L6.5 3.2H4.3z"/>',
+}
 
 
-def app_icon(p, t, x, y, s):
-    """A squircle 'app icon' holding the project logo."""
-    r = s * 0.225
-    clip = f'<clipPath id="ic"><rect x="{x}" y="{y}" width="{s}" height="{s}" rx="{r}"/></clipPath>'
+def icon(name, x, y, size, color, sw=2):
+    s = size / 24
+    if name in BRANDS:
+        return f'<g transform="translate({x},{y}) scale({s})" fill="{color}">{BRANDS[name]}</g>'
+    return (f'<g transform="translate({x},{y}) scale({s})" fill="none" stroke="{color}" stroke-width="{sw}" '
+            f'stroke-linecap="round" stroke-linejoin="round">{LUCIDE[name]}</g>')
+
+
+def badge(t, x, y, text, variant="secondary", lead=None):
+    """shadcn <Badge>: 22px pill, 12px semibold. Returns (width, svg)."""
+    pad = 10
+    lw = 16 if lead else 0
+    w = tw(text, 12, 600) + 2 * pad + lw
+    fill, stroke, fg = {"secondary": (t["muted"], "none", t["fg"]),
+                        "outline": ("none", t["border"], t["fg"]),
+                        "default": (t["primary"], "none", t["primary_fg"])}[variant]
+    out = f'<rect x="{x}" y="{y}" width="{w:.0f}" height="22" rx="11" fill="{fill}" stroke="{stroke}"/>'
+    if lead:
+        out += icon(lead, x + pad - 1, y + 5, 12, fg, 2.4)
+    out += f'<text x="{x + pad + lw:.0f}" y="{y + 15}" font-size="12" font-weight="600" fill="{fg}">{escape(text)}</text>'
+    return w, out
+
+
+def button(t, x, y, label, variant="outline", lead=None, trail=None, h=36):
+    """shadcn <Button size=default>. Returns (width, svg)."""
+    pad, gap = 16, 8
+    w = tw(label, 14, 500) * 1.08 + 2 * pad + (16 + gap if lead else 0) + (16 + gap if trail else 0)
+    fill, stroke, fg = {"outline": (t["card"], t["border"], t["fg"]),
+                        "default": (t["primary"], "none", t["primary_fg"]),
+                        "secondary": (t["muted"], "none", t["fg"])}[variant]
+    out = f'<rect x="{x}" y="{y}" width="{w:.0f}" height="{h}" rx="8" fill="{fill}" stroke="{stroke}"/>'
+    cx = x + pad
+    if lead:
+        out += icon(lead, cx, y + (h - 16) / 2, 16, fg)
+        cx += 16 + gap
+    out += f'<text x="{cx:.0f}" y="{y + h / 2 + 5}" font-size="14" font-weight="500" fill="{fg}">{escape(label)}</text>'
+    if trail:
+        out += icon(trail, x + w - pad - 16, y + (h - 16) / 2, 16, fg)
+    return w, out
+
+
+def logo_box(p, t, x, y, s):
+    """Project logo in a bordered, rounded square (shadcn Avatar, Apple corner radius)."""
+    r = s * 0.24
+    cid = f"lb{x}{y}"
+    defs = f'<clipPath id="{cid}"><rect x="{x}" y="{y}" width="{s}" height="{s}" rx="{r}"/></clipPath>'
     if p.get("photo"):
-        img = f'<image x="{x}" y="{y}" width="{s}" height="{s}" href="{data_uri(p["logo"], 192, True)}" clip-path="url(#ic)" preserveAspectRatio="xMidYMid slice"/>'
-        fill = t["tile"]
+        img = f'<image x="{x}" y="{y}" width="{s}" height="{s}" href="{data_uri(p["logo"], 192, True)}" clip-path="url(#{cid})" preserveAspectRatio="xMidYMid slice"/>'
+        fill = t["muted"]
     elif p.get("wide_logo"):
-        pad = s * 0.12
+        pad = s * 0.1
         img = f'<image x="{x + pad}" y="{y}" width="{s - 2 * pad}" height="{s}" href="{data_uri(p["logo"], 192)}" preserveAspectRatio="xMidYMid meet"/>'
         fill = "#ffffff"
     else:
-        pad = s * 0.14
+        pad = s * 0.16
         img = f'<image x="{x + pad}" y="{y + pad}" width="{s - 2 * pad}" height="{s - 2 * pad}" href="{data_uri(p["logo"], 192)}" preserveAspectRatio="xMidYMid meet"/>'
-        fill = t["tile"]
-    return clip, (f'<g filter="url(#iconShadow)"><rect x="{x}" y="{y}" width="{s}" height="{s}" rx="{r}" fill="{fill}"/></g>'
-                  f'{img}<rect x="{x + .5}" y="{y + .5}" width="{s - 1}" height="{s - 1}" rx="{r}" fill="none" stroke="{t["line"]}"/>')
+        fill = t["muted"]
+    return defs, (f'<rect x="{x}" y="{y}" width="{s}" height="{s}" rx="{r}" fill="{fill}"/>{img}'
+                  f'<rect x="{x + .5}" y="{y + .5}" width="{s - 1}" height="{s - 1}" rx="{r}" fill="none" stroke="{t["border"]}"/>')
 
 
-def pill(x, y, text, fg, bg, size=13, bold=True, icon=""):
-    w = int(len(text) * size * 0.6) + 26 + (14 if icon else 0)
-    return w, (f'<rect x="{x}" y="{y}" width="{w}" height="{size + 15}" rx="{(size + 15) / 2}" fill="{bg}"/>'
-               f'{icon}<text x="{x + 13 + (14 if icon else 0)}" y="{y + size + 4}" font-size="{size}" '
-               f'font-weight="{600 if bold else 400}" fill="{fg}">{escape(text)}</text>')
-
-
-def star_icon(x, y, color, s=12):
-    # five-point star centred on (x, y)
-    import math
-    pts = []
-    for i in range(10):
-        r = s / 2 if i % 2 == 0 else s / 4.6
-        a = math.pi / 2 + i * math.pi / 5
-        pts.append(f"{x + r * math.cos(a):.1f},{y - r * math.sin(a):.1f}")
-    return f'<polygon points="{" ".join(pts)}" fill="{color}"/>'
+def frame(t, W, H, r=14):
+    """shadcn <Card>: 1px border, soft shadow, generous radius."""
+    return (f'<rect x="8" y="8" width="{W - 16}" height="{H - 16}" rx="{r}" fill="{t["card"]}" stroke="{t["border"]}" filter="url(#sm)"/>')
 
 # ── artwork ──────────────────────────────────────────────────────────────────
 
 def card(key, p, t, theme, star_counts, wide):
-    W, H = (1200, 400) if wide else (600, 440)
-    acc = p["accent"]
-    defs = (shadow_filter(t) + shadow_filter(t, "iconShadow", 6, 10)
-            + f'<radialGradient id="glow" cx="{"88%" if wide else "100%"}" cy="0%" r="{"70%" if wide else "95%"}">'
-              f'<stop offset="0" stop-color="{acc}" stop-opacity="{t["glow"]}"/><stop offset="1" stop-color="{acc}" stop-opacity="0"/></radialGradient>'
-            + '<clipPath id="cardClip"><rect x="16" y="12" width="{w}" height="{h}" rx="30"/></clipPath>'.format(w=W - 32, h=H - 40))
-    body = (f'<g filter="url(#shadow)"><rect x="16" y="12" width="{W - 32}" height="{H - 40}" rx="30" fill="{t["card"]}"/></g>'
-            f'<g clip-path="url(#cardClip)"><rect x="16" y="12" width="{W - 32}" height="{H - 40}" fill="url(#glow)" class="breathe"/></g>'
-            f'<rect x="16.5" y="12.5" width="{W - 33}" height="{H - 41}" rx="30" fill="none" stroke="{t["line"]}"/>')
+    W, H = (1200, 270) if wide else (600, 290)
+    defs = shadow_sm(t)
+    body = frame(t, W, H)
+    ls = 64 if wide else 48
+    d, lb = logo_box(p, t, 32, 32, ls)
+    defs += d
+    body += lb
+    tx = 32 + ls + 18
 
+    # title row (+ inline eyebrow badge on wide cards)
+    ts = 26 if wide else 20
+    ty = 32 + (30 if wide else 22)
+    body += f'<text x="{tx}" y="{ty}" font-size="{ts}" font-weight="600" letter-spacing="-0.5" fill="{t["fg"]}">{escape(p["title"])}</text>'
     if wide:
-        ix, iy, isz = 64, 64, 128
-        tx, ty = 236, 92
-        desc_w = 90
+        _, b = badge(t, tx + tw(p["title"], ts, 600) + 12, ty - 18, p["eyebrow"], "secondary")
+        body += b
+        sub = p.get("tagline") or ""
     else:
-        ix, iy, isz = 52, 52, 84
-        tx, ty = 52, 190
-        desc_w = 54
-    clip, icon = app_icon(p, t, ix, iy, isz)
-    defs += clip
-    body += icon
+        sub = p["eyebrow"]
+    body += f'<text x="{tx}" y="{ty + (28 if wide else 22)}" font-size="{16 if wide else 14}" fill="{t["muted_fg"]}">{escape(sub)}</text>'
 
-    y = ty
-    body += f'<text x="{tx}" y="{y}" font-size="14" font-weight="600" letter-spacing="1.4" fill="{acc}">{escape(p["eyebrow"].upper())}</text>'
-    y += 44 if wide else 40
-    body += f'<text x="{tx}" y="{y}" font-size="{40 if wide else 32}" font-weight="700" letter-spacing="-0.8" fill="{t["text"]}">{escape(p["title"])}</text>'
-    if p.get("tagline") and wide:
-        y += 34
-        body += f'<text x="{tx}" y="{y}" font-size="23" font-weight="600" letter-spacing="-0.3" fill="{t["sub"]}">{escape(p["tagline"])}</text>'
-    y += 16
-    for line in wrap(p["desc"], desc_w):
-        y += 26
-        body += f'<text x="{tx}" y="{y}" font-size="17" fill="{t["sub"]}">{escape(line)}</text>'
-
-    # footer row
-    fy = H - 84
-    body += f'<text x="{tx if wide else 52}" y="{fy + 19}" font-size="14" fill="{t["faint"]}">{escape(p["meta"])}</text>'
-    rx = W - 52
-    cta = "View on GitHub ›" if p.get("repo") else ""
-    if cta:
-        cw = int(len(cta) * 15 * 0.56)
-        rx -= cw
-        body += f'<text x="{rx}" y="{fy + 19}" font-size="15" font-weight="500" fill="{t["link"]}">{cta}</text>'
-        rx -= 16
     # top-right badges
-    bx = W - 52
+    bx = W - 32
     if p.get("repo") and p.get("stars") is not False and star_counts.get(p["repo"], 0) >= 5:
         txt = f'{star_counts[p["repo"]]:,}'
-        w = int(len(txt) * 14 * 0.62) + 50
+        w = tw(txt, 12, 600) + 36
         bx -= w
-        body += (f'<rect x="{bx}" y="52" width="{w}" height="32" rx="16" fill="{t["bg"]}" stroke="{t["line"]}"/>'
-                 + star_icon(bx + 20, 68, "#ffcc00", 15)
-                 + f'<text x="{bx + 34}" y="73" font-size="14" font-weight="600" fill="{t["text"]}">{txt}</text>')
-        bx -= 10
+        body += badge(t, bx, 34, txt, "outline", lead="star")[1]
+        bx -= 8
     if p.get("badge"):
-        trophy = p["badge"].startswith(("Winner", "Stanford"))
-        txt = ("🏆 " if p["badge"].startswith("Winner") else "🎓 " if trophy else "") + p["badge"]
-        w = int(len(p["badge"]) * 14 * 0.58) + (52 if trophy else 30)
+        lead = "award" if p["badge"].startswith(("Winner", "Stanford")) else None
+        w = tw(p["badge"], 12, 600) + 20 + (16 if lead else 0)
         bx -= w
-        body += (f'<rect x="{bx}" y="52" width="{w}" height="32" rx="16" fill="{acc}" fill-opacity="{0.16 if theme == "dark" else 0.12}"/>'
-                 f'<text x="{bx + w / 2}" y="73" text-anchor="middle" font-size="14" font-weight="600" fill="{acc}">{escape(txt)}</text>')
+        body += badge(t, bx, 34, p["badge"], "default" if lead else "secondary", lead=lead)[1]
 
-    style = ("@keyframes breathe{0%,100%{opacity:.75}50%{opacity:1}}"
-             ".breathe{animation:breathe 6s ease-in-out infinite}")
-    return svg(W, H, body, defs, style)
+    # description
+    y = 134 if wide else 118
+    for line in wrap(p["desc"], 128 if wide else 72):
+        body += f'<text x="{32 if not wide else tx}" y="{y}" font-size="15" fill="{t["muted_fg"]}">{escape(line)}</text>'
+        y += 24
+
+    # footer: separator, tech badges, action
+    sy = H - 76
+    body += f'<line x1="9" y1="{sy}" x2="{W - 9}" y2="{sy}" stroke="{t["border"]}"/>'
+    bx = 32
+    for tech in [s.strip() for s in p["meta"].split("·")]:
+        w, b = badge(t, bx, sy + 23, tech, "outline")
+        body += b
+        bx += w + 6
+    label = "View repository" if p.get("repo") else "Read announcement"
+    w, _ = button(t, 0, 0, label, "outline", trail="arrow")
+    body += button(t, W - 32 - w, sy + 16, label, "outline", trail="arrow")[1]
+    return svg(W, H, body, defs)
 
 
 def hero(t, theme):
-    """Liquid-glass hero: circuit traces on the left flow into a neural net on the
-    right; a row of refracting glass tiles traces the path silicon → intelligence."""
-    import math, random
-    W, H = 1200, 600
+    W, H = 1200, 740
     dark = theme == "dark"
-    ink = "#ffffff" if dark else "#1d1d1f"
-    base = ("#06070c", "#0d1020") if dark else ("#eef3f8", "#f3f8f5")
-    rnd = random.Random(7)
-
-    # ── backdrop (everything here is also refracted through the glass) ──
-    blobs = [("#0a84ff", 160, 470, 250), ("#40c8e0", 420, 560, 230), ("#30d158", 640, 450, 240),
-             ("#ffd60a", 880, 560, 230), ("#ff9f0a", 1080, 440, 220), ("#64d2ff", 300, 120, 170), ("#ffb340", 960, 110, 160)]
-    op = 0.72 if dark else 0.55
-    bg = (f'<rect width="{W}" height="{H}" fill="url(#base)"/>'
-          '<g filter="url(#soft)">'
-          + "".join(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{c}" opacity="{op}" class="b{i % 4}"/>' for i, (c, x, y, r) in enumerate(blobs))
-          + '</g>')
-    line = ink
-    lo = 0.16 if dark else 0.14
-    # circuit traces (left): orthogonal runs with 45° jogs, ending in vias
-    traces = ""
-    for i in range(16):
-        y0 = 70 + i * 32 + rnd.randint(-6, 6)
-        x0 = 0
-        x1 = rnd.randint(120, 330)
-        dy = rnd.choice([-32, 0, 32])
-        x2 = x1 + abs(dy) if dy else x1
-        x3 = x2 + rnd.randint(30, 170)
-        traces += (f'<path d="M{x0} {y0}H{x1}L{x2} {y0 + dy}H{x3}" fill="none" stroke="{line}" stroke-width="1.6" stroke-linecap="round"/>'
-                   f'<circle cx="{x3}" cy="{y0 + dy}" r="4.5" fill="none" stroke="{line}" stroke-width="1.6"/>')
-    # neural net (right): layered nodes with curved synapses
-    cols = [(800, 5), (920, 7), (1040, 6), (1150, 4)]
-    nodes = [[(x, 300 + (j - (n - 1) / 2) * 62) for j in range(n)] for x, n in cols]
-    net = ""
-    for a, b in zip(nodes, nodes[1:]):
-        for (x1, y1) in a:
-            for (x2, y2) in b:
-                if rnd.random() < 0.55:
-                    mx = (x1 + x2) / 2
-                    net += f'<path d="M{x1} {y1:.0f}C{mx} {y1:.0f} {mx} {y2:.0f} {x2} {y2:.0f}" fill="none" stroke="{line}" stroke-width="1.1"/>'
-    for layer in nodes:
-        for (x, y) in layer:
-            net += f'<circle cx="{x}" cy="{y:.0f}" r="5" fill="{line}"/>'
-    bg += (f'<g mask="url(#fadeL)" opacity="{lo}">{traces}</g>'
-           f'<g mask="url(#fadeR)" opacity="{lo}">{net}</g>')
-
-    # the flow line that runs through every glass tile
-    xs = [190, 395, 600, 805, 1010]
-    cy = 452
-    pts = [(40, cy)] + [(x, cy) for x in xs] + [(1160, cy)]
-    d = f"M{pts[0][0]} {pts[0][1]}"
-    for k, ((x1, y1), (x2, y2)) in enumerate(zip(pts, pts[1:])):
-        amp = 34 if k % 2 == 0 else -34
-        d += f"C{x1 + (x2 - x1) * .4} {y1 + amp} {x1 + (x2 - x1) * .6} {y2 + amp} {x2} {y2}"
-    bg += (f'<path d="{d}" fill="none" stroke="url(#spec)" stroke-width="3" stroke-linecap="round" opacity=".9"/>'
-           f'<path d="{d}" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 22" class="flow" opacity="{.9 if dark else .8}"/>'
-           f'<circle r="7" fill="#fff" filter="url(#glowF)"><animateMotion dur="7s" repeatCount="indefinite" path="{d}"/></circle>'
-           f'<circle r="5" fill="#fff" opacity=".7" filter="url(#glowF)"><animateMotion dur="7s" begin="-3.5s" repeatCount="indefinite" path="{d}"/></circle>')
-
-    # ── glass ──
-    S, R = 104, 30
-    tiles = [("chip", "Silicon", "#0a84ff"), ("code", "Firmware", "#40c8e0"), ("plane", "Avionics", "#30d158"),
-             ("hammer", "Tools", "#ffd60a"), ("sparkles", "Intelligence", "#ff9f0a")]
-    rects = [(x - S / 2, cy - S / 2) for x in xs]
-    clip = "".join(f'<rect x="{x}" y="{y}" width="{S}" height="{S}" rx="{R}"/>' for x, y in rects)
-    # big glass card behind the headline
-    gx, gy, gw, gh, gr = 170, 110, 860, 216, 44
-    clip_card = f'<rect x="{gx}" y="{gy}" width="{gw}" height="{gh}" rx="{gr}"/>'
-
     defs = (
-        f'<linearGradient id="base" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="{base[0]}"/><stop offset="1" stop-color="{base[1]}"/></linearGradient>'
-        + spectrum_gradient("spec")
-        + '<filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="60"/></filter>'
-        '<filter id="glowF" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3" result="b"/>'
-        '<feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
-        # refraction: displace + soften + boost saturation, the "liquid" in liquid glass
-        '<filter id="refract" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">'
-        '<feTurbulence type="fractalNoise" baseFrequency="0.006 0.012" numOctaves="2" seed="11" result="n"/>'
-        '<feDisplacementMap in="SourceGraphic" in2="n" scale="70" xChannelSelector="R" yChannelSelector="G" result="d"/>'
-        '<feGaussianBlur in="d" stdDeviation="5" result="bl"/>'
-        f'<feColorMatrix in="bl" type="saturate" values="{1.3 if dark else 1.5}"/></filter>'
-        '<filter id="frost" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">'
-        '<feGaussianBlur stdDeviation="22" result="bl"/>'
-        f'<feColorMatrix in="bl" type="saturate" values="{1.0 if dark else 1.3}"/></filter>'
-        f'<filter id="gshadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity="{.45 if dark else .14}"/></filter>'
-        f'<clipPath id="glassClip">{clip}</clipPath><clipPath id="cardClip">{clip_card}</clipPath>'
-        f'<clipPath id="frame"><rect x="0" y="0" width="{W}" height="{H}" rx="40"/></clipPath>'
-        # specular rim: bright top-left, dim middle, soft bounce bottom-right
-        '<linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">'
-        f'<stop offset="0" stop-color="#fff" stop-opacity="{.95 if dark else 1}"/><stop offset=".35" stop-color="#fff" stop-opacity=".12"/>'
-        f'<stop offset=".7" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity="{.6 if dark else .9}"/></linearGradient>'
-        '<linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">'
-        f'<stop offset="0" stop-color="#fff" stop-opacity="{.22 if dark else .55}"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient>'
-        '<linearGradient id="fadeLg" x1="0" x2="1"><stop offset="0" stop-color="#fff"/><stop offset=".42" stop-color="#fff" stop-opacity="0"/></linearGradient>'
-        '<linearGradient id="fadeRg" x1="0" x2="1"><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff"/></linearGradient>'
-        f'<mask id="fadeL"><rect width="{W}" height="{H}" fill="url(#fadeLg)"/></mask>'
-        f'<mask id="fadeR"><rect width="{W}" height="{H}" fill="url(#fadeRg)"/></mask>'
-        f'<g id="bg">{bg}</g>'
+        f'<pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.1" fill="{t["dot"]}"/></pattern>'
+        '<radialGradient id="dotsFade" cx="50%" cy="38%" r="60%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
+        f'<mask id="dotsMask"><rect width="{W}" height="{H}" fill="url(#dotsFade)"/></mask>'
+        f'<radialGradient id="aura" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#0a84ff" stop-opacity="{.30 if dark else .20}"/>'
+        f'<stop offset=".55" stop-color="#40c8e0" stop-opacity="{.10 if dark else .07}"/><stop offset="1" stop-color="#40c8e0" stop-opacity="0"/></radialGradient>'
+        f'<clipPath id="heroClip"><rect x="8" y="8" width="{W - 16}" height="{H - 16}" rx="20"/></clipPath>'
+        f'<filter id="win" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#000" flood-opacity="{.6 if dark else .16}"/></filter>'
+        + shadow_sm(t)
     )
+    body = (f'<rect x="8" y="8" width="{W - 16}" height="{H - 16}" rx="20" fill="{t["card"]}" stroke="{t["border"]}"/>'
+            '<g clip-path="url(#heroClip)">'
+            f'<rect width="{W}" height="{H}" fill="url(#dots)" mask="url(#dotsMask)"/>'
+            f'<ellipse cx="600" cy="520" rx="520" ry="260" fill="url(#aura)" class="aura"/>'
+            '</g>')
 
-    tint = "#ffffff"
-    tint_op = .07 if dark else .32
-    body = '<g clip-path="url(#frame)"><use href="#bg"/>'
-    # headline glass card
-    body += (f'<rect x="{gx}" y="{gy}" width="{gw}" height="{gh}" rx="{gr}" fill="{base[0]}" filter="url(#gshadow)" opacity=".5"/>'
-             f'<g clip-path="url(#cardClip)"><use href="#bg" filter="url(#frost)"/></g>'
-             f'<rect x="{gx}" y="{gy}" width="{gw}" height="{gh}" rx="{gr}" fill="{"#000" if dark else tint}" fill-opacity="{.38 if dark else .38}"/>'
-             f'<rect x="{gx}" y="{gy}" width="{gw}" height="{gh}" rx="{gr}" fill="url(#sheen)"/>'
-             f'<rect x="{gx + .75}" y="{gy + .75}" width="{gw - 1.5}" height="{gh - 1.5}" rx="{gr}" fill="none" stroke="url(#rim)" stroke-width="1.5"/>')
-    # tiles: shadow, refracted backdrop, tint, sheen, rim, glyph, label
-    for (x, y) in rects:
-        body += f'<rect x="{x}" y="{y}" width="{S}" height="{S}" rx="{R}" fill="{base[0]}" opacity=".6" filter="url(#gshadow)"/>'
-    body += '<g clip-path="url(#glassClip)"><use href="#bg" filter="url(#refract)"/></g>'
-    for (x, y), (ic, label, c) in zip(rects, tiles):
-        body += (f'<rect x="{x}" y="{y}" width="{S}" height="{S}" rx="{R}" fill="{"#000" if dark else tint}" fill-opacity="{.22 if dark else tint_op}"/>'
-                 f'<rect x="{x}" y="{y}" width="{S}" height="{S}" rx="{R}" fill="{c}" fill-opacity="{.16 if dark else .06}"/>'
-                 f'<rect x="{x}" y="{y}" width="{S}" height="{S}" rx="{R}" fill="url(#sheen)"/>'
-                 f'<rect x="{x + .75}" y="{y + .75}" width="{S - 1.5}" height="{S - 1.5}" rx="{R}" fill="none" stroke="url(#rim)" stroke-width="1.5"/>'
-                 f'<g transform="translate({x + S / 2 - 22},{y + S / 2 - 22}) scale(1.375)" fill="{ink}" color="{ink}">{ICONS[ic]}</g>'
-                 f'<text x="{x + S / 2}" y="{y + S + 34}" text-anchor="middle" font-size="16" font-weight="600" letter-spacing="-0.1" fill="{ink}" fill-opacity="{.92 if dark else .85}">{label}</text>')
+    # announcement pill
+    label = "WireVoice won the Sarvam Epoch Buildathon 2026"
+    inner_w, inner = 64, ""
+    pw = inner_w + tw(label, 13, 500) + 44
+    px = 600 - pw / 2
+    body += (f'<rect x="{px:.0f}" y="54" width="{pw:.0f}" height="32" rx="16" fill="{t["card"]}" stroke="{t["border"]}" filter="url(#sm)"/>'
+             f'<rect x="{px + 4:.0f}" y="58" width="{inner_w}" height="24" rx="12" fill="{t["primary"]}"/>'
+             f'<text x="{px + 4 + inner_w / 2:.0f}" y="74.5" text-anchor="middle" font-size="12" font-weight="600" fill="{t["primary_fg"]}">Winner</text>'
+             f'<text x="{px + inner_w + 16:.0f}" y="75" font-size="13" font-weight="500" fill="{t["fg"]}">{label}</text>'
+             + icon("chevron", px + pw - 26, 62, 16, t["muted_fg"]))
     # headline
-    sub = "#ebebf5" if dark else "#3a3a3c"
-    body += (f'<text x="600" y="{gy + 118}" text-anchor="middle" font-size="84" font-weight="700" letter-spacing="-3" fill="{ink}">Hithesh Karanth</text>'
-             f'<text x="600" y="{gy + 170}" text-anchor="middle" font-size="26" font-weight="500" letter-spacing="-0.4" fill="{sub}">From silicon to intelligence, built to be verified.</text>')
-    # window controls, floating in the frame corner
-    body += ('<circle cx="40" cy="38" r="7" fill="#ff5f57"/><circle cx="64" cy="38" r="7" fill="#febc2e"/><circle cx="88" cy="38" r="7" fill="#28c840"/>')
-    body += '</g>'
-    body += f'<rect x=".75" y=".75" width="{W - 1.5}" height="{H - 1.5}" rx="40" fill="none" stroke="{ink}" stroke-opacity="{.14 if dark else .08}" stroke-width="1.5"/>'
+    body += (f'<text x="600" y="176" text-anchor="middle" font-size="72" font-weight="700" letter-spacing="-2.6" fill="{t["fg"]}">Hithesh Karanth</text>'
+             f'<text x="600" y="222" text-anchor="middle" font-size="21" fill="{t["muted_fg"]}">From silicon to intelligence, built to be verified.</text>')
 
-    style = (
-        "@keyframes d0{50%{transform:translate(90px,-50px)}}@keyframes d1{50%{transform:translate(-80px,-60px)}}"
-        "@keyframes d2{50%{transform:translate(70px,40px)}}@keyframes d3{50%{transform:translate(-100px,-30px)}}"
-        ".b0{animation:d0 16s ease-in-out infinite}.b1{animation:d1 19s ease-in-out infinite}"
-        ".b2{animation:d2 17s ease-in-out infinite}.b3{animation:d3 21s ease-in-out infinite}"
-        "@keyframes flow{to{stroke-dashoffset:-240}}.flow{animation:flow 6s linear infinite}"
-        "@media (prefers-reduced-motion:reduce){*{animation:none!important}}"
-    )
+    # macOS window holding a ⌘K command menu
+    wx, wy, ww = 230, 276, 740
+    rows = [("cpu", "Silicon", "C · STM32 · ESP32 · LVGL"),
+            ("code", "Firmware", "CAN · UART · USB · sensor telemetry"),
+            ("plane", "Avionics", "ARINC 615A / 665 · VxWorks"),
+            ("shield", "Assurance", "DO-178C · MISRA · CBMC · MC/DC"),
+            ("wrench", "Tools", "Code-OSS · Tauri · React · Qt 6"),
+            ("sparkles", "Intelligence", "vLLM · NVFP4 · agents · voice AI")]
+    rh = 44
+    wh = 40 + 54 + 34 + len(rows) * rh + 12
+    body += (f'<rect x="{wx}" y="{wy}" width="{ww}" height="{wh}" rx="14" fill="{t["card"]}" filter="url(#win)"/>'
+             f'<rect x="{wx + .5}" y="{wy + .5}" width="{ww - 1}" height="{wh - 1}" rx="14" fill="none" stroke="{t["border"]}"/>'
+             f'<path d="M{wx + 14} {wy + .5}H{wx + ww - 14}A13.5 13.5 0 0 1 {wx + ww - .5} {wy + 14}V{wy + 40}H{wx + .5}V{wy + 14}A13.5 13.5 0 0 1 {wx + 14} {wy + .5}z" fill="{t["muted"]}" fill-opacity=".5"/>'
+             f'<line x1="{wx}" y1="{wy + 40}" x2="{wx + ww}" y2="{wy + 40}" stroke="{t["border"]}"/>'
+             f'<circle cx="{wx + 20}" cy="{wy + 20}" r="6" fill="#ff5f57"/><circle cx="{wx + 40}" cy="{wy + 20}" r="6" fill="#febc2e"/><circle cx="{wx + 60}" cy="{wy + 20}" r="6" fill="#28c840"/>'
+             f'<text x="{wx + ww / 2}" y="{wy + 25}" text-anchor="middle" font-size="13" font-weight="500" fill="{t["muted_fg"]}">Command Menu</text>')
+    sy = wy + 40
+    body += (icon("search", wx + 20, sy + 18, 18, t["muted_fg"])
+             + f'<rect x="{wx + 50}" y="{sy + 17}" width="1.6" height="20" fill="{t["fg"]}" class="caret"/>'
+             f'<text x="{wx + 56}" y="{sy + 32}" font-size="15" fill="{t["muted_fg"]}">Search the stack…</text>'
+             f'<rect x="{wx + ww - 60}" y="{sy + 15}" width="40" height="24" rx="6" fill="{t["muted"]}" stroke="{t["border"]}"/>'
+             f'<text x="{wx + ww - 40}" y="{sy + 32}" text-anchor="middle" font-size="12" font-weight="600" fill="{t["muted_fg"]}">⌘K</text>'
+             f'<line x1="{wx}" y1="{sy + 54}" x2="{wx + ww}" y2="{sy + 54}" stroke="{t["border"]}"/>'
+             f'<text x="{wx + 20}" y="{sy + 80}" font-size="12" font-weight="500" fill="{t["muted_fg"]}">Silicon to intelligence</text>')
+    ry = sy + 92
+    # selection highlight walks down the list, Apple-smooth between stops
+    n = len(rows)
+    frames = []
+    for i in range(n):
+        a, b = i / n * 100, (i + 0.82) / n * 100
+        frames.append(f"{a:.1f}%,{b:.1f}%{{transform:translateY({i * rh}px)}}")
+    frames.append(f"100%{{transform:translateY(0px)}}")
+    body += f'<rect x="{wx + 8}" y="{ry}" width="{ww - 16}" height="{rh - 4}" rx="8" fill="{t["muted"]}" class="sel"/>'
+    for i, (ic, name, tech) in enumerate(rows):
+        y = ry + i * rh
+        body += (icon(ic, wx + 22, y + 11, 18, t["fg"])
+                 + f'<text x="{wx + 54}" y="{y + 25}" font-size="15" font-weight="500" fill="{t["fg"]}">{name}</text>'
+                 f'<text x="{wx + ww - 22}" y="{y + 25}" text-anchor="end" font-size="13" fill="{t["muted_fg"]}">{escape(tech)}</text>')
+    style = ("@keyframes sel{" + "".join(frames) + "}"
+             f".sel{{animation:sel {n * 1.6}s cubic-bezier(.4,0,.2,1) infinite}}"
+             "@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}.caret{animation:blink 1.1s steps(1) infinite}"
+             "@keyframes aura{50%{opacity:.6}}.aura{animation:aura 8s ease-in-out infinite}"
+             "@media (prefers-reduced-motion:reduce){*{animation:none!important}}")
     return svg(W, H, body, defs, style)
 
 
-ICONS = {  # simple SF Symbol-ish glyphs drawn in a 32×32 box
-    "plane": '<path d="M16 3c1.4 0 2.2 1.4 2.2 3v6.6l10.3 6.1v3l-10.3-3.2v5.7l3.3 2.5V29L16 27.6 10.5 29v-2.3l3.3-2.5v-5.7L3.5 21.7v-3l10.3-6.1V6c0-1.6.8-3 2.2-3z"/>',
-    "chip": '<rect x="8" y="8" width="16" height="16" rx="3"/><rect x="12.5" y="12.5" width="7" height="7" rx="1.2" fill-opacity=".35" fill="#fff"/>'
-            + "".join(f'<rect x="{x}" y="3" width="2.2" height="5" rx="1"/><rect x="{x}" y="24" width="2.2" height="5" rx="1"/>'
-                      f'<rect x="3" y="{x}" width="5" height="2.2" rx="1"/><rect x="24" y="{x}" width="5" height="2.2" rx="1"/>' for x in (11, 15, 19)),
-    "hammer": '<path d="M5 9.5 14.5 3l4 3.2-2.6 2.3 2 2 9.6 12.4-3.6 3.6L11.5 16.9l-2-2-2.4 2.6L4 13.6z"/>',
-    "sparkles": '<path d="M13 3l2.4 6.6L22 12l-6.6 2.4L13 21l-2.4-6.6L4 12l6.6-2.4z"/><path d="M24 17l1.3 3.7L29 22l-3.7 1.3L24 27l-1.3-3.7L19 22l3.7-1.3z"/>',
-    "code": '<g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 9 3.5 16 10 23M22 9l6.5 7-6.5 7M18.5 6l-5 20"/></g>',
-    "bolt": '<path d="M18.5 2 6 18h8.2L12 30l14-17.5h-8.3z"/>',
-}
-
-
 def bento(t, theme):
-    W, H = 1200, 470
+    W, H = 1200, 404
     tiles = [
-        # x, y, w, h, icon, color, title, lines
-        (16, 12, 576, 214, "plane", "#0a84ff", "Aerospace & Defence",
-         ["Avionics data loading, high-reliability control", "and safety-critical firmware for aircraft systems."]),
-        (608, 12, 280, 214, "chip", "#30d158", "Embedded", ["STM32 · ESP32", "Embedded Linux HMI"]),
-        (904, 12, 280, 214, "hammer", "#ff9f0a", "Developer Tools", ["AI-native IDEs,", "verification, traceability"]),
-        (16, 242, 384, 214, "sparkles", "#32ade6", "Applied AI", ["Voice assistants, research", "agents, knowledge graphs"]),
-        (416, 242, 768, 214, "bolt", "#76b900", "MLOps & Inference",
-         ["Serving 35B MoE models on a single NVIDIA DGX Spark.", "vLLM · NVFP4 / FP8 quantization · speculative decoding"]),
+        (8, 8, 584, 190, "plane", "Aerospace & Defence",
+         ["Avionics data loading, high-reliability control and", "safety-critical firmware for aircraft systems."]),
+        (600, 8, 292, 190, "cpu", "Embedded", ["STM32 · ESP32 · Embedded", "Linux HMI · telemetry"]),
+        (900, 8, 292, 190, "wrench", "Developer Tools", ["AI-native IDEs, verification", "pipelines, traceability"]),
+        (8, 206, 388, 190, "sparkles", "Applied AI", ["Voice assistants, research agents", "and knowledge graphs"]),
+        (404, 206, 788, 190, "zap", "MLOps & Inference",
+         ["Serving 35B mixture-of-experts models on a single NVIDIA DGX Spark.", "vLLM · NVFP4 / FP8 quantization · speculative decoding · observability"]),
     ]
-    defs = shadow_filter(t, "shadow", 8, 14)
+    defs = shadow_sm(t)
     body = ""
-    for i, (x, y, w, h, ic, c, title, lines) in enumerate(tiles):
-        defs += (f'<radialGradient id="g{i}" cx="100%" cy="0%" r="90%"><stop offset="0" stop-color="{c}" stop-opacity="{t["glow"]}"/>'
-                 f'<stop offset="1" stop-color="{c}" stop-opacity="0"/></radialGradient>')
-        body += (f'<g class="t{i}"><g filter="url(#shadow)"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="28" fill="{t["card"]}"/></g>'
-                 f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="28" fill="url(#g{i})"/>'
-                 f'<rect x="{x + .5}" y="{y + .5}" width="{w - 1}" height="{h - 1}" rx="28" fill="none" stroke="{t["line"]}"/>'
-                 f'<rect x="{x + 28}" y="{y + 28}" width="52" height="52" rx="13" fill="{c}"/>'
-                 f'<g transform="translate({x + 38},{y + 38}) scale(1)" fill="#fff">{ICONS[ic]}</g>'
-                 f'<text x="{x + 28}" y="{y + 126}" font-size="26" font-weight="700" letter-spacing="-0.5" fill="{t["text"]}">{escape(title)}</text>')
+    for x, y, w, h, ic, title, lines in tiles:
+        body += (f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="14" fill="{t["card"]}" stroke="{t["border"]}" filter="url(#sm)"/>'
+                 f'<rect x="{x + 24}" y="{y + 24}" width="40" height="40" rx="10" fill="{t["muted"]}" stroke="{t["border"]}"/>'
+                 + icon(ic, x + 34, y + 34, 20, t["fg"])
+                 + f'<text x="{x + 24}" y="{y + 104}" font-size="18" font-weight="600" letter-spacing="-0.3" fill="{t["fg"]}">{escape(title)}</text>')
         for j, line in enumerate(lines):
-            body += f'<text x="{x + 28}" y="{y + 156 + j * 24}" font-size="17" fill="{t["sub"]}">{escape(line)}</text>'
-        body += "</g>"
+            body += f'<text x="{x + 24}" y="{y + 132 + j * 22}" font-size="15" fill="{t["muted_fg"]}">{escape(line)}</text>'
     return svg(W, H, body, defs)
 
 
 def heading(t, title, sub, theme):
-    """Apple product-page style headline: bold statement + grey continuation."""
-    W, H = 1200, 132
-    body = (f'<text x="16" y="72" font-size="50" font-weight="700" letter-spacing="-1.6" fill="{t["text"]}">{escape(title)}'
-            f'<tspan fill="{t["faint"]}"> {escape(sub)}</tspan></text>'
-            f'<rect x="16" y="98" width="64" height="5" rx="2.5" fill="url(#bar)"/>')
-    return svg(W, H, body, spectrum_gradient("bar"))
+    """shadcn page header: tight semibold title, muted description, separator."""
+    W, H = 1200, 104
+    body = (f'<text x="8" y="44" font-size="30" font-weight="700" letter-spacing="-0.8" fill="{t["fg"]}">{escape(title)}</text>'
+            f'<text x="8" y="74" font-size="16" fill="{t["muted_fg"]}">{escape(sub)}</text>'
+            f'<line x1="8" y1="95.5" x2="{W - 8}" y2="95.5" stroke="{t["border"]}"/>')
+    return svg(W, H, body)
 
 
 def inference(t, theme):
-    W, H = 1200, 400
-    green = "#76b900"
-    defs = shadow_filter(t, "shadow", 8, 14) + (
-        f'<linearGradient id="num" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9be15d"/><stop offset="1" stop-color="{green}"/></linearGradient>')
-    body = (f'<g filter="url(#shadow)"><rect x="16" y="12" width="1168" height="364" rx="30" fill="{t["card"]}"/></g>'
-            f'<rect x="16.5" y="12.5" width="1167" height="363" rx="30" fill="none" stroke="{t["line"]}"/>'
-            f'<text x="56" y="66" font-size="14" font-weight="600" letter-spacing="1.4" fill="{green}">NVIDIA DGX SPARK · GB10 · 128 GB UNIFIED MEMORY</text>'
-            f'<text x="56" y="106" font-size="32" font-weight="700" letter-spacing="-0.8" fill="{t["text"]}">Frontier-class MoE. One desk-side box.</text>'
-            f'<text x="56" y="136" font-size="17" fill="{t["sub"]}">262K context on every model. Every number measured on the live deployment.</text>')
-    cols = [("Ornith-1.5", "351.7", "tok/s · 16 users", "NVFP4 + FP8 + MTP · vision", True),
-            ("Qwen3.8 Distill", "373", "tok/s · 16 users", "Self-quantized, data-free", False),
-            ("Qwen3.6", "219", "tok/s peak", "12 users · 5.1× prefix cache", False)]
+    """Three shadcn dashboard stat cards."""
+    W, H = 1200, 196
+    cols = [("Ornith-1.5", "351.7", "tok/s aggregate · 16 users", "NVFP4 + FP8 + MTP · vision", True),
+            ("Qwen3.8 Distill", "373", "tok/s aggregate · 16 users", "Self-quantized, data-free", False),
+            ("Qwen3.6", "219", "tok/s peak · 12 users", "Prefix cache, 5.1× faster", False)]
+    cw = (W - 16 - 2 * 16) / 3
+    defs = shadow_sm(t)
+    body = ""
     for i, (name, num, unit, note, live) in enumerate(cols):
-        x = 56 + i * 376
-        if i:
-            body += f'<line x1="{x - 24}" y1="176" x2="{x - 24}" y2="336" stroke="{t["line"]}"/>'
-        body += f'<text x="{x}" y="190" font-size="19" font-weight="600" fill="{t["text"]}">{name}</text>'
+        x = 8 + i * (cw + 16)
+        body += (f'<rect x="{x:.0f}" y="8" width="{cw:.0f}" height="{H - 16}" rx="14" fill="{t["card"]}" stroke="{t["border"]}" filter="url(#sm)"/>'
+                 f'<text x="{x + 24:.0f}" y="44" font-size="14" font-weight="500" fill="{t["fg"]}">{name}</text>'
+                 + icon("zap", x + cw - 40, 30, 16, t["muted_fg"])
+                 + f'<text x="{x + 24:.0f}" y="100" font-size="40" font-weight="700" letter-spacing="-1.2" fill="{t["fg"]}">{num}</text>'
+                 f'<text x="{x + 24:.0f}" y="128" font-size="13" fill="{t["muted_fg"]}">{unit}</text>'
+                 f'<text x="{x + 24:.0f}" y="160" font-size="13" fill="{t["muted_fg"]}">{note}</text>')
         if live:
-            body += (f'<circle cx="{x + 118}" cy="184" r="4.5" fill="#30d158" class="pulse"/>'
-                     f'<text x="{x + 128}" y="189" font-size="12" font-weight="700" letter-spacing="1" fill="#30d158">LIVE</text>')
-        body += (f'<text x="{x}" y="270" font-size="72" font-weight="800" letter-spacing="-2.5" fill="url(#num)">{num}</text>'
-                 f'<text x="{x}" y="300" font-size="16" font-weight="500" fill="{t["sub"]}">{unit}</text>'
-                 f'<text x="{x}" y="330" font-size="14" fill="{t["faint"]}">{note}</text>')
-    style = "@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}.pulse{animation:pulse 1.8s ease-in-out infinite}"
+            nw = tw(num, 40, 700) - 8
+            body += (f'<rect x="{x + 24 + nw + 14:.0f}" y="76" width="56" height="22" rx="11" fill="{t["live_bg"]}"/>'
+                     f'<circle cx="{x + 24 + nw + 26:.0f}" cy="87" r="3.5" fill="#22c55e" class="pulse"/>'
+                     f'<text x="{x + 24 + nw + 34:.0f}" y="91.5" font-size="12" font-weight="600" fill="{t["live_fg"]}">Live</text>')
+    style = "@keyframes pulse{50%{opacity:.3}}.pulse{animation:pulse 1.8s ease-in-out infinite}"
     return svg(W, H, body, defs, style)
 
 
 def stack(t, theme):
-    W = 1200
-    layers = [  # top (intelligence) to bottom (silicon)
-        ("Intelligence", "#ff9f0a", ["vLLM", "NVFP4 / FP8", "Speculative decoding", "Voice AI", "Agents", "Claude · Gemini · Codex"]),
-        ("Tools", "#ffd60a", ["TypeScript", "React", "Tauri", "Code-OSS", "FastAPI", "PySide6"]),
-        ("Assurance", "#30d158", ["DO-178C", "MISRA", "CBMC", "CodeQL", "MC/DC", "Traceability"]),
-        ("Systems", "#40c8e0", ["C++23", "Rust", "Qt 6", "Embedded Linux", "VxWorks", "ARINC 615A / 665"]),
-        ("Silicon", "#0a84ff", ["C", "STM32", "ESP32", "LVGL", "CAN · UART · USB", "Sensor telemetry"]),
-    ]
-    row, gap, top = 76, 12, 12
-    H = top + len(layers) * (row + gap) + 16
-    defs = shadow_filter(t, "shadow", 6, 12)
-    body = ""
-    for i, (name, c, items) in enumerate(layers):
-        y = top + i * (row + gap)
-        defs += (f'<linearGradient id="l{i}" x1="0" x2="1"><stop offset="0" stop-color="{c}" stop-opacity="{t["glow"]}"/>'
-                 f'<stop offset=".45" stop-color="{c}" stop-opacity="0"/></linearGradient>')
-        body += (f'<g filter="url(#shadow)"><rect x="16" y="{y}" width="{W - 32}" height="{row}" rx="22" fill="{t["card"]}"/></g>'
-                 f'<rect x="16" y="{y}" width="{W - 32}" height="{row}" rx="22" fill="url(#l{i})"/>'
-                 f'<rect x="16.5" y="{y + .5}" width="{W - 33}" height="{row - 1}" rx="22" fill="none" stroke="{t["line"]}"/>'
-                 f'<circle cx="52" cy="{y + row / 2}" r="7" fill="{c}"/>'
-                 f'<text x="72" y="{y + row / 2 + 7}" font-size="20" font-weight="700" letter-spacing="-0.3" fill="{t["text"]}">{name}</text>')
-        x = 250
+    """shadcn <Table> inside a card: layer → technologies."""
+    layers = [("sparkles", "Intelligence", ["vLLM", "NVFP4 / FP8", "Speculative decoding", "Voice AI", "Agents", "Claude · Gemini · Codex"]),
+              ("wrench", "Tools", ["TypeScript", "React", "Tauri", "Code-OSS", "FastAPI", "PySide6"]),
+              ("shield", "Assurance", ["DO-178C", "MISRA", "CBMC", "CodeQL", "MC/DC", "Traceability"]),
+              ("plane", "Systems", ["C++23", "Rust", "Qt 6", "Embedded Linux", "VxWorks", "ARINC 615A / 665"]),
+              ("cpu", "Silicon", ["C", "STM32", "ESP32", "LVGL", "CAN · UART · USB", "Sensor telemetry"])]
+    W, hh, rh = 1200, 44, 58
+    H = 16 + hh + len(layers) * rh
+    defs = shadow_sm(t) + f'<clipPath id="tbl"><rect x="8" y="8" width="{W - 16}" height="{H - 16}" rx="14"/></clipPath>'
+    body = (f'<rect x="8" y="8" width="{W - 16}" height="{H - 16}" rx="14" fill="{t["card"]}" filter="url(#sm)"/>'
+            f'<g clip-path="url(#tbl)"><rect x="8" y="8" width="{W - 16}" height="{hh}" fill="{t["muted"]}" fill-opacity=".5"/></g>'
+            f'<text x="32" y="{8 + hh / 2 + 5}" font-size="13" font-weight="500" fill="{t["muted_fg"]}">Layer</text>'
+            f'<text x="240" y="{8 + hh / 2 + 5}" font-size="13" font-weight="500" fill="{t["muted_fg"]}">Technologies</text>')
+    for i, (ic, name, items) in enumerate(layers):
+        y = 8 + hh + i * rh
+        body += f'<line x1="8" y1="{y}" x2="{W - 8}" y2="{y}" stroke="{t["border"]}"/>'
+        body += (icon(ic, 32, y + rh / 2 - 9, 18, t["fg"])
+                 + f'<text x="60" y="{y + rh / 2 + 5}" font-size="15" font-weight="500" fill="{t["fg"]}">{name}</text>')
+        x = 240
         for it in items:
-            w = int(len(it) * 15 * 0.56) + 28
-            body += (f'<rect x="{x}" y="{y + row / 2 - 17}" width="{w}" height="34" rx="17" fill="{t["bg"]}" stroke="{t["line"]}"/>'
-                     f'<text x="{x + w / 2}" y="{y + row / 2 + 5}" text-anchor="middle" font-size="15" font-weight="500" fill="{t["sub"]}">{escape(it)}</text>')
-            x += w + 10
+            w, b = badge(t, x, y + rh / 2 - 11, it, "secondary")
+            body += b
+            x += w + 6
+    body += f'<rect x="8.5" y="8.5" width="{W - 17}" height="{H - 17}" rx="14" fill="none" stroke="{t["border"]}"/>'
     return svg(W, H, body, defs)
 
 
-def dock_icon(t, kind):
-    S = 96
-    g = {
-        "github": ("#24292f", '<path fill="#fff" transform="translate(24,24) scale(3)" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>'),
-        "x": ("#000000", '<path fill="#fff" transform="translate(26,26) scale(1.85)" d="M18.9 1.2h3.7l-8 9.2 9.4 12.4h-7.4l-5.8-7.6-6.6 7.6H.5l8.6-9.8L0 1.2h7.6l5.2 6.9zm-1.3 19.4h2L6.5 3.2H4.3z"/>'),
-        "web": ("#0071e3", '<g fill="none" stroke="#fff" stroke-width="4"><circle cx="48" cy="48" r="22"/><ellipse cx="48" cy="48" rx="10" ry="22"/><path d="M26 48h44M30 37h36M30 59h36"/></g>'),
-        "repos": ("#ff9f0a", '<g fill="#fff"><rect x="26" y="30" width="44" height="40" rx="6" fill-opacity=".55"/><rect x="26" y="24" width="20" height="12" rx="4"/><rect x="26" y="34" width="44" height="36" rx="6"/></g>'),
-    }[kind]
-    defs = (f'<linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/>'
-            f'<stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>')
-    body = (f'<rect x="4" y="4" width="{S - 8}" height="{S - 8}" rx="21" fill="{g[0]}"/>{g[1]}'
-            f'<rect x="4" y="4" width="{S - 8}" height="{S - 8}" rx="21" fill="url(#sheen)"/>'
-            f'<rect x="4.5" y="4.5" width="{S - 9}" height="{S - 9}" rx="21" fill="none" stroke="{t["chrome_line"]}" stroke-opacity=".6"/>')
-    return svg(S, S, body, defs)
+def link_button(t, kind):
+    label, ic, variant = {"x": ("@HitheshKaranth", "x", "outline"),
+                          "web": ("FlyVI Technologies", "globe", "outline"),
+                          "repos": ("Repositories", "folder", "outline"),
+                          "github": ("Follow on GitHub", "github", "default")}[kind]
+    w, b = button(t, 4, 4, label, variant, lead=ic, h=40)
+    W = int(w) + 8
+    return svg(W, 48, f'<g filter="url(#sm)">{b}</g>', shadow_sm(t))
 
 
 def footer(t, theme):
-    W, H = 1200, 90
-    body = (f'<text x="600" y="40" text-anchor="middle" font-size="15" fill="{t["faint"]}">Thanks for stopping by. Built in the open.</text>'
-            f'<rect x="568" y="60" width="64" height="5" rx="2.5" fill="url(#bar)"/>')
-    return svg(W, H, body, spectrum_gradient("bar"))
+    W, H = 1200, 64
+    body = (f'<line x1="8" y1="8.5" x2="{W - 8}" y2="8.5" stroke="{t["border"]}"/>'
+            f'<text x="8" y="44" font-size="14" fill="{t["muted_fg"]}">Hithesh Karanth</text>'
+            f'<text x="{W - 8}" y="44" text-anchor="end" font-size="14" fill="{t["muted_fg"]}">Thanks for stopping by.</text>')
+    return svg(W, H, body)
 
 # ── main ─────────────────────────────────────────────────────────────────────
 
 WIDE = {"noyce", "wirevoice", "openterminalui", "arinc", "ornith"}
 HEADINGS = {
-    "now": ("Building now.", "Firmware you can prove."),
-    "award": ("Recognition.", "Shipped under a deadline."),
-    "oss": ("Open source.", "Yours to run."),
-    "systems": ("Systems work.", "Close to the metal."),
-    "mlops": ("Inference.", "Self-hosted, measured."),
-    "about": ("What I do.", "Across the stack."),
-    "stack": ("Stack.", "Every layer, hands-on."),
-    "stars": ("Momentum.", "Stars over time."),
+    "about": ("About", "Aerospace, embedded systems, developer tools and applied AI."),
+    "now": ("Building now", "What I'm shipping at the moment."),
+    "award": ("Recognition", "Hackathons and awards."),
+    "oss": ("Open source", "Projects anyone can run, fork and extend."),
+    "systems": ("Systems work", "Avionics, firmware and hardware tooling."),
+    "mlops": ("Inference", "Self-hosted LLM serving on NVIDIA DGX Spark. Every number measured on the live deployment."),
+    "stack": ("Stack", "From silicon to intelligence, layer by layer."),
+    "stars": ("Star history", "How the open-source projects have grown."),
 }
 
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
+    for old in OUT.glob("*.svg"):
+        old.unlink()
     counts = stars()
     for theme, t in THEMES.items():
         files = {
@@ -559,7 +512,7 @@ def main():
         for k, (a, b) in HEADINGS.items():
             files[f"h-{k}-{theme}.svg"] = heading(t, a, b, theme)
         for k in ("github", "x", "web", "repos"):
-            files[f"dock-{k}-{theme}.svg"] = dock_icon(t, k)
+            files[f"btn-{k}-{theme}.svg"] = link_button(t, k)
         for name, content in files.items():
             (OUT / name).write_text(content)
     # Stamp README image links with a content hash so browsers and GitHub's

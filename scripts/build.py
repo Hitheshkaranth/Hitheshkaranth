@@ -257,48 +257,142 @@ def card(key, p, t, theme, star_counts, wide):
 
 
 def hero(t, theme):
-    W, H = 1200, 520
-    blobs = [("#0894ff", 240, 360, 260), ("#c959dd", 620, 470, 240), ("#ff2e54", 920, 330, 220), ("#ff9004", 1080, 520, 200)]
-    op = 0.55 if theme == "dark" else 0.32
-    defs = (shadow_filter(t, "win", 18, 28)
-            + '<filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="70"/></filter>'
-            + '<clipPath id="winClip"><rect x="24" y="16" width="1152" height="472" rx="18"/></clipPath>'
-            + spectrum_gradient("name")
-            + f'<linearGradient id="fadeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{t["card"]}" stop-opacity="1"/>'
-              f'<stop offset="1" stop-color="{t["card"]}" stop-opacity="0.15"/></linearGradient>')
-    blob_svg = "".join(
-        f'<circle cx="{x}" cy="{y}" r="{r}" fill="{c}" opacity="{op}" class="b{i}"/>' for i, (c, x, y, r) in enumerate(blobs))
-    body = (
-        f'<g filter="url(#win)"><rect x="24" y="16" width="1152" height="472" rx="18" fill="{t["card"]}"/></g>'
-        f'<g clip-path="url(#winClip)">'
-        f'<g filter="url(#blur)">{blob_svg}</g>'
-        f'<rect x="24" y="16" width="1152" height="472" fill="url(#fadeTop)"/>'
-        # title bar
-        f'<rect x="24" y="16" width="1152" height="52" fill="{t["chrome"]}" fill-opacity="0.82"/>'
-        f'<line x1="24" y1="68" x2="1176" y2="68" stroke="{t["chrome_line"]}"/>'
-        '<circle cx="54" cy="42" r="7" fill="#ff5f57"/><circle cx="78" cy="42" r="7" fill="#febc2e"/><circle cx="102" cy="42" r="7" fill="#28c840"/>'
-        f'<text x="600" y="47" text-anchor="middle" font-size="14" font-weight="600" fill="{t["sub"]}">hithesh — ~/profile</text>'
-        '</g>'
-        f'<rect x="24.5" y="16.5" width="1151" height="471" rx="18" fill="none" stroke="{t["chrome_line"]}"/>'
-        # content
-        f'<g class="in1"><text x="600" y="146" text-anchor="middle" font-size="17" font-weight="600" letter-spacing="2" fill="{t["sub"]}">CTO · FLYVI TECHNOLOGIES</text></g>'
-        f'<g class="in2"><text x="600" y="246" text-anchor="middle" font-size="96" font-weight="800" letter-spacing="-3.5" fill="url(#name)">Hithesh Karanth.</text></g>'
-        f'<g class="in3"><text x="600" y="306" text-anchor="middle" font-size="27" font-weight="600" letter-spacing="-0.5" fill="{t["text"]}">Tools that make complex engineering systems</text>'
-        f'<text x="600" y="342" text-anchor="middle" font-size="27" font-weight="600" letter-spacing="-0.5" fill="{t["text"]}">easier to inspect, operate, and verify.</text></g>'
+    """Liquid-glass hero: circuit traces on the left flow into a neural net on the
+    right; a row of refracting glass tiles traces the path silicon → intelligence."""
+    import math, random
+    W, H = 1200, 600
+    dark = theme == "dark"
+    ink = "#ffffff" if dark else "#1d1d1f"
+    base = ("#06070c", "#0d1020") if dark else ("#eef1f8", "#f8f4f6")
+    rnd = random.Random(7)
+
+    # ── backdrop (everything here is also refracted through the glass) ──
+    blobs = [("#0a84ff", 160, 470, 250), ("#5e5ce6", 420, 560, 230), ("#bf5af2", 640, 450, 240),
+             ("#ff375f", 880, 560, 230), ("#ff9f0a", 1080, 440, 220), ("#64d2ff", 300, 120, 170), ("#ff6ad5", 960, 110, 160)]
+    op = 0.72 if dark else 0.55
+    bg = (f'<rect width="{W}" height="{H}" fill="url(#base)"/>'
+          '<g filter="url(#soft)">'
+          + "".join(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{c}" opacity="{op}" class="b{i % 4}"/>' for i, (c, x, y, r) in enumerate(blobs))
+          + '</g>')
+    line = ink
+    lo = 0.16 if dark else 0.14
+    # circuit traces (left): orthogonal runs with 45° jogs, ending in vias
+    traces = ""
+    for i in range(16):
+        y0 = 70 + i * 32 + rnd.randint(-6, 6)
+        x0 = 0
+        x1 = rnd.randint(120, 330)
+        dy = rnd.choice([-32, 0, 32])
+        x2 = x1 + abs(dy) if dy else x1
+        x3 = x2 + rnd.randint(30, 170)
+        traces += (f'<path d="M{x0} {y0}H{x1}L{x2} {y0 + dy}H{x3}" fill="none" stroke="{line}" stroke-width="1.6" stroke-linecap="round"/>'
+                   f'<circle cx="{x3}" cy="{y0 + dy}" r="4.5" fill="none" stroke="{line}" stroke-width="1.6"/>')
+    # neural net (right): layered nodes with curved synapses
+    cols = [(800, 5), (920, 7), (1040, 6), (1150, 4)]
+    nodes = [[(x, 300 + (j - (n - 1) / 2) * 62) for j in range(n)] for x, n in cols]
+    net = ""
+    for a, b in zip(nodes, nodes[1:]):
+        for (x1, y1) in a:
+            for (x2, y2) in b:
+                if rnd.random() < 0.55:
+                    mx = (x1 + x2) / 2
+                    net += f'<path d="M{x1} {y1:.0f}C{mx} {y1:.0f} {mx} {y2:.0f} {x2} {y2:.0f}" fill="none" stroke="{line}" stroke-width="1.1"/>'
+    for layer in nodes:
+        for (x, y) in layer:
+            net += f'<circle cx="{x}" cy="{y:.0f}" r="5" fill="{line}"/>'
+    bg += (f'<g mask="url(#fadeL)" opacity="{lo}">{traces}</g>'
+           f'<g mask="url(#fadeR)" opacity="{lo}">{net}</g>')
+
+    # the flow line that runs through every glass tile
+    xs = [190, 395, 600, 805, 1010]
+    cy = 452
+    pts = [(40, cy)] + [(x, cy) for x in xs] + [(1160, cy)]
+    d = f"M{pts[0][0]} {pts[0][1]}"
+    for k, ((x1, y1), (x2, y2)) in enumerate(zip(pts, pts[1:])):
+        amp = 34 if k % 2 == 0 else -34
+        d += f"C{x1 + (x2 - x1) * .4} {y1 + amp} {x1 + (x2 - x1) * .6} {y2 + amp} {x2} {y2}"
+    bg += (f'<path d="{d}" fill="none" stroke="url(#spec)" stroke-width="3" stroke-linecap="round" opacity=".9"/>'
+           f'<path d="{d}" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 22" class="flow" opacity="{.9 if dark else .8}"/>'
+           f'<circle r="7" fill="#fff" filter="url(#glowF)"><animateMotion dur="7s" repeatCount="indefinite" path="{d}"/></circle>'
+           f'<circle r="5" fill="#fff" opacity=".7" filter="url(#glowF)"><animateMotion dur="7s" begin="-3.5s" repeatCount="indefinite" path="{d}"/></circle>')
+
+    # ── glass ──
+    S, R = 104, 30
+    tiles = [("chip", "Silicon", "#0a84ff"), ("code", "Firmware", "#5e5ce6"), ("plane", "Avionics", "#bf5af2"),
+             ("hammer", "Tools", "#ff375f"), ("sparkles", "Intelligence", "#ff9f0a")]
+    rects = [(x - S / 2, cy - S / 2) for x in xs]
+    clip = "".join(f'<rect x="{x}" y="{y}" width="{S}" height="{S}" rx="{R}"/>' for x, y in rects)
+    # big glass card behind the headline
+    gx, gy, gw, gh, gr = 170, 96, 860, 248, 44
+    clip_card = f'<rect x="{gx}" y="{gy}" width="{gw}" height="{gh}" rx="{gr}"/>'
+
+    defs = (
+        f'<linearGradient id="base" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="{base[0]}"/><stop offset="1" stop-color="{base[1]}"/></linearGradient>'
+        + spectrum_gradient("spec")
+        + '<filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="60"/></filter>'
+        '<filter id="glowF" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3" result="b"/>'
+        '<feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+        # refraction: displace + soften + boost saturation, the "liquid" in liquid glass
+        '<filter id="refract" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">'
+        '<feTurbulence type="fractalNoise" baseFrequency="0.006 0.012" numOctaves="2" seed="11" result="n"/>'
+        '<feDisplacementMap in="SourceGraphic" in2="n" scale="70" xChannelSelector="R" yChannelSelector="G" result="d"/>'
+        '<feGaussianBlur in="d" stdDeviation="5" result="bl"/>'
+        f'<feColorMatrix in="bl" type="saturate" values="{1.3 if dark else 1.5}"/></filter>'
+        '<filter id="frost" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">'
+        '<feGaussianBlur stdDeviation="22" result="bl"/>'
+        f'<feColorMatrix in="bl" type="saturate" values="{1.0 if dark else 1.3}"/></filter>'
+        f'<filter id="gshadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity="{.45 if dark else .14}"/></filter>'
+        f'<clipPath id="glassClip">{clip}</clipPath><clipPath id="cardClip">{clip_card}</clipPath>'
+        f'<clipPath id="frame"><rect x="0" y="0" width="{W}" height="{H}" rx="40"/></clipPath>'
+        # specular rim: bright top-left, dim middle, soft bounce bottom-right
+        '<linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">'
+        f'<stop offset="0" stop-color="#fff" stop-opacity="{.95 if dark else 1}"/><stop offset=".35" stop-color="#fff" stop-opacity=".12"/>'
+        f'<stop offset=".7" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity="{.6 if dark else .9}"/></linearGradient>'
+        '<linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">'
+        f'<stop offset="0" stop-color="#fff" stop-opacity="{.22 if dark else .55}"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient>'
+        '<linearGradient id="fadeLg" x1="0" x2="1"><stop offset="0" stop-color="#fff"/><stop offset=".42" stop-color="#fff" stop-opacity="0"/></linearGradient>'
+        '<linearGradient id="fadeRg" x1="0" x2="1"><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff"/></linearGradient>'
+        f'<mask id="fadeL"><rect width="{W}" height="{H}" fill="url(#fadeLg)"/></mask>'
+        f'<mask id="fadeR"><rect width="{W}" height="{H}" fill="url(#fadeRg)"/></mask>'
+        f'<g id="bg">{bg}</g>'
     )
-    # prompt line with blinking cursor
-    prompt = "~ $ avionics · embedded · developer tools · applied AI · inference"
-    pw = len(prompt) * 15 * 0.6
-    px = 600 - pw / 2
-    body += (f'<g class="in4"><rect x="{px - 22}" y="388" width="{pw + 52}" height="44" rx="22" fill="{t["bg"]}" fill-opacity="0.75" stroke="{t["line"]}"/>'
-             f'<text x="{px}" y="416" font-family="{MONO}" font-size="15" textLength="{pw:.0f}" lengthAdjust="spacingAndGlyphs" fill="{t["sub"]}">{escape(prompt)}</text>'
-             f'<rect x="{px + pw + 8}" y="400" width="9" height="20" rx="1.5" fill="{SPECTRUM[0]}" class="cursor"/></g>')
+
+    tint = "#ffffff"
+    tint_op = .07 if dark else .32
+    body = '<g clip-path="url(#frame)"><use href="#bg"/>'
+    # headline glass card
+    body += (f'<rect x="{gx}" y="{gy}" width="{gw}" height="{gh}" rx="{gr}" fill="{base[0]}" filter="url(#gshadow)" opacity=".5"/>'
+             f'<g clip-path="url(#cardClip)"><use href="#bg" filter="url(#frost)"/></g>'
+             f'<rect x="{gx}" y="{gy}" width="{gw}" height="{gh}" rx="{gr}" fill="{"#000" if dark else tint}" fill-opacity="{.38 if dark else .38}"/>'
+             f'<rect x="{gx}" y="{gy}" width="{gw}" height="{gh}" rx="{gr}" fill="url(#sheen)"/>'
+             f'<rect x="{gx + .75}" y="{gy + .75}" width="{gw - 1.5}" height="{gh - 1.5}" rx="{gr}" fill="none" stroke="url(#rim)" stroke-width="1.5"/>')
+    # tiles: shadow, refracted backdrop, tint, sheen, rim, glyph, label
+    for (x, y) in rects:
+        body += f'<rect x="{x}" y="{y}" width="{S}" height="{S}" rx="{R}" fill="{base[0]}" opacity=".6" filter="url(#gshadow)"/>'
+    body += '<g clip-path="url(#glassClip)"><use href="#bg" filter="url(#refract)"/></g>'
+    for (x, y), (ic, label, c) in zip(rects, tiles):
+        body += (f'<rect x="{x}" y="{y}" width="{S}" height="{S}" rx="{R}" fill="{"#000" if dark else tint}" fill-opacity="{.22 if dark else tint_op}"/>'
+                 f'<rect x="{x}" y="{y}" width="{S}" height="{S}" rx="{R}" fill="{c}" fill-opacity="{.16 if dark else .06}"/>'
+                 f'<rect x="{x}" y="{y}" width="{S}" height="{S}" rx="{R}" fill="url(#sheen)"/>'
+                 f'<rect x="{x + .75}" y="{y + .75}" width="{S - 1.5}" height="{S - 1.5}" rx="{R}" fill="none" stroke="url(#rim)" stroke-width="1.5"/>'
+                 f'<g transform="translate({x + S / 2 - 22},{y + S / 2 - 22}) scale(1.375)" fill="{ink}" color="{ink}">{ICONS[ic]}</g>'
+                 f'<text x="{x + S / 2}" y="{y + S + 34}" text-anchor="middle" font-size="16" font-weight="600" letter-spacing="-0.1" fill="{ink}" fill-opacity="{.92 if dark else .85}">{label}</text>')
+    # headline
+    sub = "#ebebf5" if dark else "#3a3a3c"
+    body += (f'<text x="600" y="{gy + 58}" text-anchor="middle" font-size="15" font-weight="600" letter-spacing="2.6" fill="{sub}" fill-opacity=".8">CTO · FLYVI TECHNOLOGIES</text>'
+             f'<text x="600" y="{gy + 146}" text-anchor="middle" font-size="84" font-weight="700" letter-spacing="-3" fill="{ink}">Hithesh Karanth</text>'
+             f'<text x="600" y="{gy + 198}" text-anchor="middle" font-size="26" font-weight="500" letter-spacing="-0.4" fill="{sub}">From silicon to intelligence, built to be verified.</text>')
+    # window controls, floating in the frame corner
+    body += ('<circle cx="40" cy="38" r="7" fill="#ff5f57"/><circle cx="64" cy="38" r="7" fill="#febc2e"/><circle cx="88" cy="38" r="7" fill="#28c840"/>')
+    body += '</g>'
+    body += f'<rect x=".75" y=".75" width="{W - 1.5}" height="{H - 1.5}" rx="40" fill="none" stroke="{ink}" stroke-opacity="{.14 if dark else .08}" stroke-width="1.5"/>'
+
     style = (
-        "@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}.cursor{animation:blink 1.1s steps(1) infinite}"
-        "@keyframes d0{50%{transform:translate(120px,-60px)}}@keyframes d1{50%{transform:translate(-100px,-80px)}}"
-        "@keyframes d2{50%{transform:translate(80px,70px)}}@keyframes d3{50%{transform:translate(-140px,-40px)}}"
-        ".b0{animation:d0 14s ease-in-out infinite}.b1{animation:d1 17s ease-in-out infinite}"
-        ".b2{animation:d2 15s ease-in-out infinite}.b3{animation:d3 19s ease-in-out infinite}"
+        "@keyframes d0{50%{transform:translate(90px,-50px)}}@keyframes d1{50%{transform:translate(-80px,-60px)}}"
+        "@keyframes d2{50%{transform:translate(70px,40px)}}@keyframes d3{50%{transform:translate(-100px,-30px)}}"
+        ".b0{animation:d0 16s ease-in-out infinite}.b1{animation:d1 19s ease-in-out infinite}"
+        ".b2{animation:d2 17s ease-in-out infinite}.b3{animation:d3 21s ease-in-out infinite}"
+        "@keyframes flow{to{stroke-dashoffset:-240}}.flow{animation:flow 6s linear infinite}"
         "@media (prefers-reduced-motion:reduce){*{animation:none!important}}"
     )
     return svg(W, H, body, defs, style)
@@ -311,6 +405,7 @@ ICONS = {  # simple SF Symbol-ish glyphs drawn in a 32×32 box
                       f'<rect x="3" y="{x}" width="5" height="2.2" rx="1"/><rect x="24" y="{x}" width="5" height="2.2" rx="1"/>' for x in (11, 15, 19)),
     "hammer": '<path d="M5 9.5 14.5 3l4 3.2-2.6 2.3 2 2 9.6 12.4-3.6 3.6L11.5 16.9l-2-2-2.4 2.6L4 13.6z"/>',
     "sparkles": '<path d="M13 3l2.4 6.6L22 12l-6.6 2.4L13 21l-2.4-6.6L4 12l6.6-2.4z"/><path d="M24 17l1.3 3.7L29 22l-3.7 1.3L24 27l-1.3-3.7L19 22l3.7-1.3z"/>',
+    "code": '<g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 9 3.5 16 10 23M22 9l6.5 7-6.5 7M18.5 6l-5 20"/></g>',
     "bolt": '<path d="M18.5 2 6 18h8.2L12 30l14-17.5h-8.3z"/>',
 }
 
@@ -381,6 +476,37 @@ def inference(t, theme):
     return svg(W, H, body, defs, style)
 
 
+def stack(t, theme):
+    W = 1200
+    layers = [  # top (intelligence) to bottom (silicon)
+        ("Intelligence", "#ff9f0a", ["vLLM", "NVFP4 / FP8", "Speculative decoding", "Voice AI", "Agents", "Claude · Gemini · Codex"]),
+        ("Tools", "#ff375f", ["TypeScript", "React", "Tauri", "Code-OSS", "FastAPI", "PySide6"]),
+        ("Assurance", "#bf5af2", ["DO-178C", "MISRA", "CBMC", "CodeQL", "MC/DC", "Traceability"]),
+        ("Systems", "#5e5ce6", ["C++23", "Rust", "Qt 6", "Embedded Linux", "VxWorks", "ARINC 615A / 665"]),
+        ("Silicon", "#0a84ff", ["C", "STM32", "ESP32", "LVGL", "CAN · UART · USB", "Sensor telemetry"]),
+    ]
+    row, gap, top = 76, 12, 12
+    H = top + len(layers) * (row + gap) + 16
+    defs = shadow_filter(t, "shadow", 6, 12)
+    body = ""
+    for i, (name, c, items) in enumerate(layers):
+        y = top + i * (row + gap)
+        defs += (f'<linearGradient id="l{i}" x1="0" x2="1"><stop offset="0" stop-color="{c}" stop-opacity="{t["glow"]}"/>'
+                 f'<stop offset=".45" stop-color="{c}" stop-opacity="0"/></linearGradient>')
+        body += (f'<g filter="url(#shadow)"><rect x="16" y="{y}" width="{W - 32}" height="{row}" rx="22" fill="{t["card"]}"/></g>'
+                 f'<rect x="16" y="{y}" width="{W - 32}" height="{row}" rx="22" fill="url(#l{i})"/>'
+                 f'<rect x="16.5" y="{y + .5}" width="{W - 33}" height="{row - 1}" rx="22" fill="none" stroke="{t["line"]}"/>'
+                 f'<circle cx="52" cy="{y + row / 2}" r="7" fill="{c}"/>'
+                 f'<text x="72" y="{y + row / 2 + 7}" font-size="20" font-weight="700" letter-spacing="-0.3" fill="{t["text"]}">{name}</text>')
+        x = 250
+        for it in items:
+            w = int(len(it) * 15 * 0.56) + 28
+            body += (f'<rect x="{x}" y="{y + row / 2 - 17}" width="{w}" height="34" rx="17" fill="{t["bg"]}" stroke="{t["line"]}"/>'
+                     f'<text x="{x + w / 2}" y="{y + row / 2 + 5}" text-anchor="middle" font-size="15" font-weight="500" fill="{t["sub"]}">{escape(it)}</text>')
+            x += w + 10
+    return svg(W, H, body, defs)
+
+
 def dock_icon(t, kind):
     S = 96
     g = {
@@ -413,8 +539,8 @@ HEADINGS = {
     "systems": ("Systems work.", "Close to the metal."),
     "mlops": ("Inference.", "Self-hosted, measured."),
     "about": ("What I do.", "Across the stack."),
-    "stack": ("Toolbox.", "The everyday kit."),
-    "activity": ("Activity.", "Always shipping."),
+    "stack": ("Stack.", "Every layer, hands-on."),
+    "stars": ("Momentum.", "Stars over time."),
 }
 
 
@@ -426,6 +552,7 @@ def main():
             f"hero-{theme}.svg": hero(t, theme),
             f"bento-{theme}.svg": bento(t, theme),
             f"inference-{theme}.svg": inference(t, theme),
+            f"stack-{theme}.svg": stack(t, theme),
             f"footer-{theme}.svg": footer(t, theme),
         }
         for k, p in PROJECTS.items():

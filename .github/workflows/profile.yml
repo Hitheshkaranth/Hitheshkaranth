@@ -34,19 +34,3 @@ jobs:
           git add assets/gen scripts/stars.json
           git diff --cached --quiet || git commit -m "chore: refresh profile artwork" && git push
 
-  snake:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: Platane/snk@v3
-        with:
-          github_user_name: ${{ github.repository_owner }}
-          outputs: |
-            dist/snake-light.svg?palette=github-light&color_snake=#0071e3&color_dots=#ebedf0,#cfe3ff,#8cc1ff,#409cff,#0071e3
-            dist/snake-dark.svg?palette=github-dark&color_snake=#2997ff&color_dots=#161b22,#0b2a4a,#0f4f8f,#1f78d1,#2997ff
-      - uses: crazy-max/ghaction-github-pages@v4
-        with:
-          target_branch: output
-          build_dir: dist
-          commit_message: "chore: update contribution snake"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

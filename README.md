@@ -3,7 +3,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/hero-dark.svg">
-    <img src="./assets/gen/hero-light.svg" width="100%" alt="Hithesh Karanth, CTO at FlyVI Technologies: tools that make complex engineering systems easier to inspect, operate, and verify">
+    <img src="./assets/gen/hero-light.svg" width="100%" alt="Hithesh Karanth, CTO at FlyVI Technologies. From silicon to intelligence: silicon, firmware, avionics, tools and AI">
   </picture>
 </p>
 
@@ -146,37 +146,26 @@ I lead technology at [FlyVI Technologies](https://www.flyvitech.com/), building 
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-stack-dark.svg">
-  <img src="./assets/gen/h-stack-light.svg" width="100%" alt="Toolbox.">
+  <img src="./assets/gen/h-stack-light.svg" width="100%" alt="Stack.">
 </picture>
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://skillicons.dev/icons?i=c,cpp,rust,py,ts,react,fastapi,qt,tauri,electron,linux,arduino,raspberrypi&perline=13&theme=dark">
-    <img src="https://skillicons.dev/icons?i=c,cpp,rust,py,ts,react,fastapi,qt,tauri,electron,linux,arduino,raspberrypi&perline=13&theme=light" width="100%" alt="C, C++, Rust, Python, TypeScript, React, FastAPI, Qt, Tauri, Electron, Linux, Arduino, Raspberry Pi">
-  </picture>
-</p>
-
-<p align="center"><sub>MISRA · CBMC · CodeQL · MC/DC · vLLM · NVFP4 / FP8 · Prometheus · Grafana · DCGM · Tailscale</sub></p>
-
-<br>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-activity-dark.svg">
-  <img src="./assets/gen/h-activity-light.svg" width="100%" alt="Activity.">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/stack-dark.svg">
+  <img src="./assets/gen/stack-light.svg" width="100%" alt="Stack, from silicon to intelligence: C, STM32, ESP32, LVGL; C++23, Rust, Qt 6, Embedded Linux, VxWorks, ARINC 615A; DO-178C, MISRA, CBMC, CodeQL, MC/DC; TypeScript, React, Tauri, Code-OSS, FastAPI, PySide6; vLLM, NVFP4/FP8, speculative decoding, voice AI, agents">
+</picture>
+
+<br><br>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-stars-dark.svg">
+  <img src="./assets/gen/h-stars-light.svg" width="100%" alt="Momentum.">
 </picture>
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Hitheshkaranth/Hitheshkaranth/output/snake-dark.svg">
-    <img src="https://raw.githubusercontent.com/Hitheshkaranth/Hitheshkaranth/output/snake-light.svg" width="100%" alt="Contribution graph being eaten by a snake">
-  </picture>
-</p>
-
-<p align="center">
-  <a href="https://www.star-history.com/#Hitheshkaranth/OpenTerminalUI&Hitheshkaranth/OpenTokenMonitor&Hitheshkaranth/EmbeddedDisplayStudio&Date">
+  <a href="https://www.star-history.com/#Hitheshkaranth/OpenTerminalUI&Hitheshkaranth/OpenTokenMonitor&Hitheshkaranth/EmbeddedDisplayStudio&Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup&Date">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio&type=Date&theme=dark">
-      <img src="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio&type=Date" width="100%" alt="Star history for OpenTerminalUI, OpenTokenMonitor and EmbeddedDisplayStudio">
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio%2CHitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup&type=Date&theme=dark">
+      <img src="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio%2CHitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup&type=Date" width="100%" alt="Star history for OpenTerminalUI, OpenTokenMonitor, EmbeddedDisplayStudio and Ornith-1.5">
     </picture>
   </a>
 </p>

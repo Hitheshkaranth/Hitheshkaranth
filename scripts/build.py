@@ -5,7 +5,7 @@ Run locally or from the daily workflow:  python3 scripts/build.py
 Star counts are fetched from the GitHub API (GITHUB_TOKEN optional) and cached
 in scripts/stars.json so the build still works offline.
 """
-import base64, io, json, os, textwrap, urllib.request
+import base64, hashlib, io, json, os, re, textwrap, urllib.request
 from pathlib import Path
 from xml.sax.saxutils import escape
 
@@ -563,7 +563,12 @@ def main():
             files[f"dock-{k}-{theme}.svg"] = dock_icon(t, k)
         for name, content in files.items():
             (OUT / name).write_text(content)
-    print(f"wrote {len(list(OUT.glob('*.svg')))} files to {OUT.relative_to(ROOT)}")
+    # Stamp README image links with a content hash so browsers and GitHub's
+    # image cache fetch the new artwork as soon as it changes.
+    digest = hashlib.sha1(b"".join(f.read_bytes() for f in sorted(OUT.glob("*.svg")))).hexdigest()[:8]
+    readme = ROOT / "README.md"
+    readme.write_text(re.sub(r'(\./assets/gen/[\w.-]+\.svg)(\?v=\w+)?', rf"\1?v={digest}", readme.read_text()))
+    print(f"wrote {len(list(OUT.glob('*.svg')))} files to {OUT.relative_to(ROOT)}, version {digest}")
 
 
 if __name__ == "__main__":

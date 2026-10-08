@@ -323,7 +323,7 @@ def hero(t, theme):
     rects = [(x - S / 2, cy - S / 2) for x in xs]
     clip = "".join(f'<rect x="{x}" y="{y}" width="{S}" height="{S}" rx="{R}"/>' for x, y in rects)
     # big glass card behind the headline
-    gx, gy, gw, gh, gr = 170, 96, 860, 248, 44
+    gx, gy, gw, gh, gr = 170, 110, 860, 216, 44
     clip_card = f'<rect x="{gx}" y="{gy}" width="{gw}" height="{gh}" rx="{gr}"/>'
 
     defs = (
@@ -379,9 +379,8 @@ def hero(t, theme):
                  f'<text x="{x + S / 2}" y="{y + S + 34}" text-anchor="middle" font-size="16" font-weight="600" letter-spacing="-0.1" fill="{ink}" fill-opacity="{.92 if dark else .85}">{label}</text>')
     # headline
     sub = "#ebebf5" if dark else "#3a3a3c"
-    body += (f'<text x="600" y="{gy + 58}" text-anchor="middle" font-size="15" font-weight="600" letter-spacing="2.6" fill="{sub}" fill-opacity=".8">CTO · FLYVI TECHNOLOGIES</text>'
-             f'<text x="600" y="{gy + 146}" text-anchor="middle" font-size="84" font-weight="700" letter-spacing="-3" fill="{ink}">Hithesh Karanth</text>'
-             f'<text x="600" y="{gy + 198}" text-anchor="middle" font-size="26" font-weight="500" letter-spacing="-0.4" fill="{sub}">From silicon to intelligence, built to be verified.</text>')
+    body += (f'<text x="600" y="{gy + 118}" text-anchor="middle" font-size="84" font-weight="700" letter-spacing="-3" fill="{ink}">Hithesh Karanth</text>'
+             f'<text x="600" y="{gy + 170}" text-anchor="middle" font-size="26" font-weight="500" letter-spacing="-0.4" fill="{sub}">From silicon to intelligence, built to be verified.</text>')
     # window controls, floating in the frame corner
     body += ('<circle cx="40" cy="38" r="7" fill="#ff5f57"/><circle cx="64" cy="38" r="7" fill="#febc2e"/><circle cx="88" cy="38" r="7" fill="#28c840"/>')
     body += '</g>'

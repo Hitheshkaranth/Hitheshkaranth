@@ -27,12 +27,12 @@ THEMES = {
                   chrome_line="#3a3a3c", shadow="0.55", glow="0.28"),
 }
 # Apple Intelligence-style spectrum
-SPECTRUM = ["#0894ff", "#c959dd", "#ff2e54", "#ff9004"]
+SPECTRUM = ["#0a84ff", "#40c8e0", "#30d158", "#ff9f0a"]
 
 # ── data ─────────────────────────────────────────────────────────────────────
 
 PROJECTS = {
-    "noyce": dict(repo="noyce-ide-dist", logo="noyce-ide.png", accent="#5e5ce6",
+    "noyce": dict(repo="noyce-ide-dist", logo="noyce-ide.png", accent="#40c8e0",
         eyebrow="Building now", title="Noyce IDE",
         tagline="Firmware you can prove.",
         desc="An AI-native Code-OSS workbench for safety-critical firmware. Requirements, source, tests, "
@@ -55,7 +55,7 @@ PROJECTS = {
         desc="A local-first desktop widget for Claude, Codex and Gemini usage. Quotas, trends and cost "
              "signals in real time. Nothing leaves your machine.",
         meta="Rust · Tauri", badge="MIT"),
-    "eds": dict(repo="EmbeddedDisplayStudio", logo="embedded-display-studio.png", accent="#bf5af2",
+    "eds": dict(repo="EmbeddedDisplayStudio", logo="embedded-display-studio.png", accent="#32ade6",
         eyebrow="Open source", title="EmbeddedDisplayStudio",
         desc="Describe, draw or bring an HMI and ship it to embedded Linux panels. AI design, a C + LVGL "
              "runtime, and atomic SSH deploys with automatic rollback.",
@@ -263,12 +263,12 @@ def hero(t, theme):
     W, H = 1200, 600
     dark = theme == "dark"
     ink = "#ffffff" if dark else "#1d1d1f"
-    base = ("#06070c", "#0d1020") if dark else ("#eef1f8", "#f8f4f6")
+    base = ("#06070c", "#0d1020") if dark else ("#eef3f8", "#f3f8f5")
     rnd = random.Random(7)
 
     # ── backdrop (everything here is also refracted through the glass) ──
-    blobs = [("#0a84ff", 160, 470, 250), ("#5e5ce6", 420, 560, 230), ("#bf5af2", 640, 450, 240),
-             ("#ff375f", 880, 560, 230), ("#ff9f0a", 1080, 440, 220), ("#64d2ff", 300, 120, 170), ("#ff6ad5", 960, 110, 160)]
+    blobs = [("#0a84ff", 160, 470, 250), ("#40c8e0", 420, 560, 230), ("#30d158", 640, 450, 240),
+             ("#ffd60a", 880, 560, 230), ("#ff9f0a", 1080, 440, 220), ("#64d2ff", 300, 120, 170), ("#ffb340", 960, 110, 160)]
     op = 0.72 if dark else 0.55
     bg = (f'<rect width="{W}" height="{H}" fill="url(#base)"/>'
           '<g filter="url(#soft)">'
@@ -318,8 +318,8 @@ def hero(t, theme):
 
     # ── glass ──
     S, R = 104, 30
-    tiles = [("chip", "Silicon", "#0a84ff"), ("code", "Firmware", "#5e5ce6"), ("plane", "Avionics", "#bf5af2"),
-             ("hammer", "Tools", "#ff375f"), ("sparkles", "Intelligence", "#ff9f0a")]
+    tiles = [("chip", "Silicon", "#0a84ff"), ("code", "Firmware", "#40c8e0"), ("plane", "Avionics", "#30d158"),
+             ("hammer", "Tools", "#ffd60a"), ("sparkles", "Intelligence", "#ff9f0a")]
     rects = [(x - S / 2, cy - S / 2) for x in xs]
     clip = "".join(f'<rect x="{x}" y="{y}" width="{S}" height="{S}" rx="{R}"/>' for x, y in rects)
     # big glass card behind the headline
@@ -418,7 +418,7 @@ def bento(t, theme):
          ["Avionics data loading, high-reliability control", "and safety-critical firmware for aircraft systems."]),
         (608, 12, 280, 214, "chip", "#30d158", "Embedded", ["STM32 · ESP32", "Embedded Linux HMI"]),
         (904, 12, 280, 214, "hammer", "#ff9f0a", "Developer Tools", ["AI-native IDEs,", "verification, traceability"]),
-        (16, 242, 384, 214, "sparkles", "#bf5af2", "Applied AI", ["Voice assistants, research", "agents, knowledge graphs"]),
+        (16, 242, 384, 214, "sparkles", "#32ade6", "Applied AI", ["Voice assistants, research", "agents, knowledge graphs"]),
         (416, 242, 768, 214, "bolt", "#76b900", "MLOps & Inference",
          ["Serving 35B MoE models on a single NVIDIA DGX Spark.", "vLLM · NVFP4 / FP8 quantization · speculative decoding"]),
     ]
@@ -480,9 +480,9 @@ def stack(t, theme):
     W = 1200
     layers = [  # top (intelligence) to bottom (silicon)
         ("Intelligence", "#ff9f0a", ["vLLM", "NVFP4 / FP8", "Speculative decoding", "Voice AI", "Agents", "Claude · Gemini · Codex"]),
-        ("Tools", "#ff375f", ["TypeScript", "React", "Tauri", "Code-OSS", "FastAPI", "PySide6"]),
-        ("Assurance", "#bf5af2", ["DO-178C", "MISRA", "CBMC", "CodeQL", "MC/DC", "Traceability"]),
-        ("Systems", "#5e5ce6", ["C++23", "Rust", "Qt 6", "Embedded Linux", "VxWorks", "ARINC 615A / 665"]),
+        ("Tools", "#ffd60a", ["TypeScript", "React", "Tauri", "Code-OSS", "FastAPI", "PySide6"]),
+        ("Assurance", "#30d158", ["DO-178C", "MISRA", "CBMC", "CodeQL", "MC/DC", "Traceability"]),
+        ("Systems", "#40c8e0", ["C++23", "Rust", "Qt 6", "Embedded Linux", "VxWorks", "ARINC 615A / 665"]),
         ("Silicon", "#0a84ff", ["C", "STM32", "ESP32", "LVGL", "CAN · UART · USB", "Sensor telemetry"]),
     ]
     row, gap, top = 76, 12, 12

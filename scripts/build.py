@@ -298,76 +298,88 @@ def card(key, p, t, theme, star_counts, wide):
 
 
 def hero(t, theme):
-    W, H = 1200, 740
+    W, H = 1200, 770
     dark = theme == "dark"
     defs = (
         f'<pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.1" fill="{t["dot"]}"/></pattern>'
-        '<radialGradient id="dotsFade" cx="50%" cy="38%" r="60%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
+        '<radialGradient id="dotsFade" cx="50%" cy="30%" r="62%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
         f'<mask id="dotsMask"><rect width="{W}" height="{H}" fill="url(#dotsFade)"/></mask>'
-        f'<radialGradient id="aura" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#0a84ff" stop-opacity="{.30 if dark else .20}"/>'
-        f'<stop offset=".55" stop-color="#40c8e0" stop-opacity="{.10 if dark else .07}"/><stop offset="1" stop-color="#40c8e0" stop-opacity="0"/></radialGradient>'
+        # spotlight from above the headline (Apple keynote lighting)
+        f'<radialGradient id="spot" cx="50%" cy="0%" r="70%" fx="50%" fy="0%"><stop offset="0" stop-color="{"#ffffff" if dark else "#0a84ff"}" stop-opacity="{.13 if dark else .07}"/>'
+        f'<stop offset="1" stop-color="{"#ffffff" if dark else "#0a84ff"}" stop-opacity="0"/></radialGradient>'
+        f'<radialGradient id="aura" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#0a84ff" stop-opacity="{.26 if dark else .16}"/>'
+        f'<stop offset=".6" stop-color="#40c8e0" stop-opacity="{.08 if dark else .05}"/><stop offset="1" stop-color="#40c8e0" stop-opacity="0"/></radialGradient>'
+        # headline fades from foreground to muted, like shadcn's hero type
+        f'<linearGradient id="ink" gradientUnits="userSpaceOnUse" x1="0" y1="88" x2="0" y2="160"><stop offset="0" stop-color="{t["fg"]}"/>'
+        f'<stop offset="1" stop-color="{t["fg"]}" stop-opacity="{.62 if dark else .72}"/></linearGradient>'
         f'<clipPath id="heroClip"><rect x="8" y="8" width="{W - 16}" height="{H - 16}" rx="20"/></clipPath>'
-        f'<filter id="win" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#000" flood-opacity="{.6 if dark else .16}"/></filter>'
+        f'<filter id="win" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="28" stdDeviation="32" flood-color="#000" flood-opacity="{.65 if dark else .14}"/></filter>'
         + shadow_sm(t)
     )
-    body = (f'<rect x="8" y="8" width="{W - 16}" height="{H - 16}" rx="20" fill="{t["card"]}" stroke="{t["border"]}"/>'
+    body = (f'<rect x="8" y="8" width="{W - 16}" height="{H - 16}" rx="20" fill="{t["card"]}"/>'
             '<g clip-path="url(#heroClip)">'
             f'<rect width="{W}" height="{H}" fill="url(#dots)" mask="url(#dotsMask)"/>'
-            f'<ellipse cx="600" cy="520" rx="520" ry="260" fill="url(#aura)" class="aura"/>'
-            '</g>')
+            f'<rect width="{W}" height="{H}" fill="url(#spot)"/>'
+            f'<ellipse cx="600" cy="500" rx="540" ry="250" fill="url(#aura)" class="aura"/>'
+            '</g>'
+            f'<rect x="8.5" y="8.5" width="{W - 17}" height="{H - 17}" rx="20" fill="none" stroke="{t["border"]}"/>')
 
-    # announcement pill
-    label = "WireVoice won the Sarvam Epoch Buildathon 2026"
-    inner_w, inner = 64, ""
-    pw = inner_w + tw(label, 13, 500) + 44
-    px = 600 - pw / 2
-    body += (f'<rect x="{px:.0f}" y="54" width="{pw:.0f}" height="32" rx="16" fill="{t["card"]}" stroke="{t["border"]}" filter="url(#sm)"/>'
-             f'<rect x="{px + 4:.0f}" y="58" width="{inner_w}" height="24" rx="12" fill="{t["primary"]}"/>'
-             f'<text x="{px + 4 + inner_w / 2:.0f}" y="74.5" text-anchor="middle" font-size="12" font-weight="600" fill="{t["primary_fg"]}">Winner</text>'
-             f'<text x="{px + inner_w + 16:.0f}" y="75" font-size="13" font-weight="500" fill="{t["fg"]}">{label}</text>'
-             + icon("chevron", px + pw - 26, 62, 16, t["muted_fg"]))
     # headline
-    body += (f'<text x="600" y="176" text-anchor="middle" font-size="72" font-weight="700" letter-spacing="-2.6" fill="{t["fg"]}">Hithesh Karanth</text>'
-             f'<text x="600" y="222" text-anchor="middle" font-size="21" fill="{t["muted_fg"]}">From silicon to intelligence, built to be verified.</text>')
+    body += (f'<text x="600" y="148" text-anchor="middle" font-size="80" font-weight="700" letter-spacing="-3" fill="url(#ink)">Hithesh Karanth</text>'
+             f'<text x="600" y="198" text-anchor="middle" font-size="21" fill="{t["muted_fg"]}">From silicon to intelligence, built to be verified.</text>')
 
     # macOS window holding a ⌘K command menu
-    wx, wy, ww = 230, 276, 740
+    wx, wy, ww = 250, 250, 700
     rows = [("cpu", "Silicon", "C · STM32 · ESP32 · LVGL"),
-            ("code", "Firmware", "CAN · UART · USB · sensor telemetry"),
+            ("code", "Firmware", "CAN · UART · USB · telemetry"),
             ("plane", "Avionics", "ARINC 615A / 665 · VxWorks"),
             ("shield", "Assurance", "DO-178C · MISRA · CBMC · MC/DC"),
             ("wrench", "Tools", "Code-OSS · Tauri · React · Qt 6"),
             ("sparkles", "Intelligence", "vLLM · NVFP4 · agents · voice AI")]
-    rh = 44
-    wh = 40 + 54 + 34 + len(rows) * rh + 12
+    rh, tb, sb, gl, fb = 46, 40, 54, 34, 42
+    wh = tb + sb + gl + len(rows) * rh + 8 + fb
     body += (f'<rect x="{wx}" y="{wy}" width="{ww}" height="{wh}" rx="14" fill="{t["card"]}" filter="url(#win)"/>'
-             f'<rect x="{wx + .5}" y="{wy + .5}" width="{ww - 1}" height="{wh - 1}" rx="14" fill="none" stroke="{t["border"]}"/>'
-             f'<path d="M{wx + 14} {wy + .5}H{wx + ww - 14}A13.5 13.5 0 0 1 {wx + ww - .5} {wy + 14}V{wy + 40}H{wx + .5}V{wy + 14}A13.5 13.5 0 0 1 {wx + 14} {wy + .5}z" fill="{t["muted"]}" fill-opacity=".5"/>'
-             f'<line x1="{wx}" y1="{wy + 40}" x2="{wx + ww}" y2="{wy + 40}" stroke="{t["border"]}"/>'
+             f'<path d="M{wx + 14} {wy + .5}H{wx + ww - 14}A13.5 13.5 0 0 1 {wx + ww - .5} {wy + 14}V{wy + tb}H{wx + .5}V{wy + 14}A13.5 13.5 0 0 1 {wx + 14} {wy + .5}z" fill="{t["muted"]}" fill-opacity=".45"/>'
+             f'<line x1="{wx}" y1="{wy + tb}" x2="{wx + ww}" y2="{wy + tb}" stroke="{t["border"]}"/>'
              f'<circle cx="{wx + 20}" cy="{wy + 20}" r="6" fill="#ff5f57"/><circle cx="{wx + 40}" cy="{wy + 20}" r="6" fill="#febc2e"/><circle cx="{wx + 60}" cy="{wy + 20}" r="6" fill="#28c840"/>'
              f'<text x="{wx + ww / 2}" y="{wy + 25}" text-anchor="middle" font-size="13" font-weight="500" fill="{t["muted_fg"]}">Command Menu</text>')
-    sy = wy + 40
+    sy = wy + tb
     body += (icon("search", wx + 20, sy + 18, 18, t["muted_fg"])
-             + f'<rect x="{wx + 50}" y="{sy + 17}" width="1.6" height="20" fill="{t["fg"]}" class="caret"/>'
-             f'<text x="{wx + 56}" y="{sy + 32}" font-size="15" fill="{t["muted_fg"]}">Search the stack…</text>'
+             + f'<rect x="{wx + 50}" y="{sy + 17}" width="1.6" height="20" rx=".8" fill="{t["fg"]}" class="caret"/>'
+             f'<text x="{wx + 57}" y="{sy + 32}" font-size="15" fill="{t["muted_fg"]}">Search the stack…</text>'
              f'<rect x="{wx + ww - 60}" y="{sy + 15}" width="40" height="24" rx="6" fill="{t["muted"]}" stroke="{t["border"]}"/>'
              f'<text x="{wx + ww - 40}" y="{sy + 32}" text-anchor="middle" font-size="12" font-weight="600" fill="{t["muted_fg"]}">⌘K</text>'
-             f'<line x1="{wx}" y1="{sy + 54}" x2="{wx + ww}" y2="{sy + 54}" stroke="{t["border"]}"/>'
-             f'<text x="{wx + 20}" y="{sy + 80}" font-size="12" font-weight="500" fill="{t["muted_fg"]}">Silicon to intelligence</text>')
-    ry = sy + 92
-    # selection highlight walks down the list, Apple-smooth between stops
+             f'<line x1="{wx}" y1="{sy + sb}" x2="{wx + ww}" y2="{sy + sb}" stroke="{t["border"]}"/>'
+             f'<text x="{wx + 20}" y="{sy + sb + 23}" font-size="12" font-weight="500" fill="{t["muted_fg"]}">Silicon to intelligence</text>')
+    ry = sy + sb + gl
+    # selection highlight walks down the list, easing between stops
     n = len(rows)
-    frames = []
-    for i in range(n):
-        a, b = i / n * 100, (i + 0.82) / n * 100
-        frames.append(f"{a:.1f}%,{b:.1f}%{{transform:translateY({i * rh}px)}}")
-    frames.append(f"100%{{transform:translateY(0px)}}")
-    body += f'<rect x="{wx + 8}" y="{ry}" width="{ww - 16}" height="{rh - 4}" rx="8" fill="{t["muted"]}" class="sel"/>'
+    frames = [f"{i / n * 100:.1f}%,{(i + .82) / n * 100:.1f}%{{transform:translateY({i * rh}px)}}" for i in range(n)]
+    frames.append("100%{transform:translateY(0px)}")
+    body += f'<rect x="{wx + 8}" y="{ry}" width="{ww - 16}" height="{rh - 4}" rx="9" fill="{t["muted"]}" class="sel"/>'
     for i, (ic, name, tech) in enumerate(rows):
         y = ry + i * rh
-        body += (icon(ic, wx + 22, y + 11, 18, t["fg"])
-                 + f'<text x="{wx + 54}" y="{y + 25}" font-size="15" font-weight="500" fill="{t["fg"]}">{name}</text>'
-                 f'<text x="{wx + ww - 22}" y="{y + 25}" text-anchor="end" font-size="13" fill="{t["muted_fg"]}">{escape(tech)}</text>')
+        body += (f'<rect x="{wx + 18}" y="{y + 7}" width="28" height="28" rx="7" fill="{t["card"]}" stroke="{t["border"]}"/>'
+                 + icon(ic, wx + 24, y + 13, 16, t["fg"])
+                 + f'<text x="{wx + 58}" y="{y + 26}" font-size="15" font-weight="500" fill="{t["fg"]}">{name}</text>'
+                 f'<text x="{wx + ww - 22}" y="{y + 26}" text-anchor="end" font-size="13" fill="{t["muted_fg"]}">{escape(tech)}</text>')
+    # cmdk-style footer with keyboard hints
+    fy = ry + n * rh + 8
+    body += (f'<path d="M{wx + .5} {fy}H{wx + ww - .5}V{wy + wh - 14}A13.5 13.5 0 0 1 {wx + ww - 14} {wy + wh - .5}H{wx + 14}A13.5 13.5 0 0 1 {wx + .5} {wy + wh - 14}z" fill="{t["muted"]}" fill-opacity=".45"/>'
+             f'<line x1="{wx}" y1="{fy}" x2="{wx + ww}" y2="{fy}" stroke="{t["border"]}"/>'
+             + icon("sparkles", wx + 20, fy + 13, 16, t["muted_fg"])
+             + f'<text x="{wx + 44}" y="{fy + 26}" font-size="12" font-weight="500" fill="{t["muted_fg"]}">hitheshkaranth</text>')
+    kx = wx + ww - 20
+    for label, keys in (("Open", ["↵"]), ("Navigate", ["↓", "↑"])):
+        kx -= tw(label, 12, 500) + 2
+        body += f'<text x="{kx:.0f}" y="{fy + 26}" font-size="12" font-weight="500" fill="{t["muted_fg"]}">{label}</text>'
+        for k in keys:
+            kx -= 26
+            body += (f'<rect x="{kx:.0f}" y="{fy + 10}" width="20" height="22" rx="5" fill="{t["card"]}" stroke="{t["border"]}"/>'
+                     f'<text x="{kx + 10:.0f}" y="{fy + 25.5}" text-anchor="middle" font-size="12" font-weight="600" fill="{t["muted_fg"]}">{k}</text>')
+        kx -= 18
+    body += f'<rect x="{wx + .5}" y="{wy + .5}" width="{ww - 1}" height="{wh - 1}" rx="14" fill="none" stroke="{t["border"]}"/>'
+
     style = ("@keyframes sel{" + "".join(frames) + "}"
              f".sel{{animation:sel {n * 1.6}s cubic-bezier(.4,0,.2,1) infinite}}"
              "@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}.caret{animation:blink 1.1s steps(1) infinite}"

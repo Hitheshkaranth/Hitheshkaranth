@@ -116,15 +116,18 @@ def stars():
 
 
 def data_uri(name, size, photo=False):
-    im = Image.open(ASSETS / name).convert("RGBA")
-    if photo:  # center-crop to square so it fills the icon
-        s = min(im.size)
-        l, t = (im.width - s) // 2, (im.height - s) // 2
-        im = im.crop((l, t, l + s, t + s))
-    im.thumbnail((size, size), Image.LANCZOS)
-    buf = io.BytesIO()
-    im.save(buf, "PNG", optimize=True)
-    return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
+    # Resized icons are cached on disk so CI reruns embed byte-identical images.
+    cached = OUT / "icons" / f"{Path(name).stem}-{size}{'-sq' if photo else ''}.png"
+    if not cached.exists():
+        im = Image.open(ASSETS / name).convert("RGBA")
+        if photo:  # center-crop to square so it fills the icon
+            s = min(im.size)
+            l, t = (im.width - s) // 2, (im.height - s) // 2
+            im = im.crop((l, t, l + s, t + s))
+        im.thumbnail((size, size), Image.LANCZOS)
+        cached.parent.mkdir(parents=True, exist_ok=True)
+        im.save(cached, "PNG", optimize=True)
+    return "data:image/png;base64," + base64.b64encode(cached.read_bytes()).decode()
 
 
 def wrap(text, width):

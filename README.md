@@ -164,8 +164,8 @@ I lead technology at [FlyVI Technologies](https://www.flyvitech.com/), building 
 <p align="center">
   <a href="https://www.star-history.com/#Hitheshkaranth/OpenTerminalUI&Hitheshkaranth/OpenTokenMonitor&Hitheshkaranth/EmbeddedDisplayStudio&Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup&Date">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio%2CHitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup&type=Date&theme=dark">
-      <img src="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio%2CHitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup&type=Date" width="100%" alt="Star history for OpenTerminalUI, OpenTokenMonitor, EmbeddedDisplayStudio and Ornith-1.5">
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio%2CHitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup&type=Date&theme=dark&v=20261009">
+      <img src="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio%2CHitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup&type=Date&v=20261009" width="100%" alt="Star history for OpenTerminalUI, OpenTokenMonitor, EmbeddedDisplayStudio and Ornith-1.5">
     </picture>
   </a>
 </p>

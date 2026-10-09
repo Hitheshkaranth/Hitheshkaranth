@@ -537,7 +537,11 @@ def main():
     # image cache fetch the new artwork as soon as it changes.
     digest = hashlib.sha1(b"".join(f.read_bytes() for f in sorted(OUT.glob("*.svg")))).hexdigest()[:8]
     readme = ROOT / "README.md"
-    readme.write_text(re.sub(r'(\./assets/gen/[\w.-]+\.svg)(\?v=\w+)?', rf"\1?v={digest}", readme.read_text()))
+    text = re.sub(r'(\./assets/gen/[\w.-]+\.svg)(\?v=\w+)?', rf"\1?v={digest}", readme.read_text())
+    # GitHub's image proxy caches the star-history chart too; bust it once a day.
+    day = __import__("datetime").date.today().strftime("%Y%m%d")
+    text = re.sub(r'(api\.star-history\.com/svg\?[^"]*?)(&v=\d+)?"', rf'\1&v={day}"', text)
+    readme.write_text(text)
     print(f"wrote {len(list(OUT.glob('*.svg')))} files to {OUT.relative_to(ROOT)}, version {digest}")
 
 

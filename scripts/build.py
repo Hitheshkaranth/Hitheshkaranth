@@ -37,13 +37,13 @@ PROJECTS = {
         tagline="Firmware you can prove.",
         desc="An AI-native Code-OSS workbench for safety-critical firmware. Requirements, source, tests, "
              "traceability, MISRA, CBMC, CodeQL, measured MC/DC and hardware tooling in one window.",
-        meta="DO-178C evidence · Code-OSS · TypeScript", badge="Stanford × DeepMind Hackathon", stars=False),
+        meta="DO-178C evidence · Code-OSS · TypeScript", award="Stanford × DeepMind Hackathon", stars=False),
     "wirevoice": dict(repo=None, logo="wirevoice.png", accent="#ff9f0a",
         eyebrow="Recognition", title="WireVoice",
         tagline="Ask the schematic. In your language.",
         desc="A voice-first assistant for technicians on complex wiring harness drawings. It names the "
              "terminal, the wire gauge and the exact sheet it came from, across eleven Indian languages.",
-        meta="Voice AI · Sarvam · Python", badge="Winner · Sarvam Epoch Buildathon 2026", stars=False),
+        meta="Voice AI · Sarvam · Python", award="Winner · Sarvam Epoch Buildathon 2026", stars=False),
     "openterminalui": dict(repo="OpenTerminalUI", logo="openterminalui.png", accent="#30d158",
         eyebrow="Open source", title="OpenTerminalUI",
         tagline="A trading terminal you own.",
@@ -59,7 +59,7 @@ PROJECTS = {
         eyebrow="Open source", title="EmbeddedDisplayStudio",
         desc="Describe, draw or bring an HMI and ship it to embedded Linux panels. AI design, a C + LVGL "
              "runtime, and atomic SSH deploys with automatic rollback.",
-        meta="Python · LVGL · Embedded Linux", badge="MIT"),
+        meta="Python · LVGL · Embedded Linux", badge="MIT", award="Berkeley × DeepMind Hackathon"),
     "arinc": dict(repo="arinc-615a-cli-tool-suite", logo="arinc-logo.webp", accent="#64d2ff", wide_logo=True,
         eyebrow="Avionics", title="ARINC 615A Tool Suite",
         tagline="Load software onto aircraft. Over Ethernet.",
@@ -262,6 +262,8 @@ def card(key, p, t, theme, star_counts, wide):
     else:
         sub = p["eyebrow"]
     body += f'<text x="{tx}" y="{ty + (28 if wide else 22)}" font-size="{16 if wide else 14}" fill="{t["muted_fg"]}">{escape(sub)}</text>'
+    if p.get("award") and not wide:  # no room top-right on half-width cards: sit beside the subtitle
+        body += badge(t, tx + tw(sub, 14) + 10, ty + 6, p["award"], "default", lead="award")[1]
 
     # top-right badges
     bx = W - 32
@@ -272,10 +274,14 @@ def card(key, p, t, theme, star_counts, wide):
         body += badge(t, bx, 34, txt, "outline", lead="star")[1]
         bx -= 8
     if p.get("badge"):
-        lead = "award" if p["badge"].startswith(("Winner", "Stanford")) else None
-        w = tw(p["badge"], 12, 600) + 20 + (16 if lead else 0)
+        w, _ = badge(t, 0, 0, p["badge"], "secondary")
         bx -= w
-        body += badge(t, bx, 34, p["badge"], "default" if lead else "secondary", lead=lead)[1]
+        body += badge(t, bx, 34, p["badge"], "secondary")[1]
+        bx -= 8
+    if p.get("award") and wide:
+        w, _ = badge(t, 0, 0, p["award"], "default", lead="award")
+        bx -= w
+        body += badge(t, bx, 34, p["award"], "default", lead="award")[1]
 
     # description
     y = 134 if wide else 118

@@ -1,10 +1,10 @@
 {
-  "EmbeddedDisplayStudio": 12,
+  "EmbeddedDisplayStudio": 13,
   "Netra_Device_Firmware_V1": 3,
   "Netra_System_Debugger_V1": 2,
-  "OpenTerminalUI": 269,
+  "OpenTerminalUI": 271,
   "OpenTokenMonitor": 22,
-  "Ornith-1.5_A3B_Model_DGX_Spark_Setup": 24,
+  "Ornith-1.5_A3B_Model_DGX_Spark_Setup": 25,
   "Qwen-3_6_Model_DGX_Spark_Setup": 0,
   "Qwen-3_8_A3B_Model_DGX_Spark_Setup": 2,
   "arinc-615a-cli-tool-suite": 2

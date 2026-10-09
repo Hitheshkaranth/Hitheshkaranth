@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths: [scripts/**, assets/*.png, assets/*.jpg, assets/*.webp, .github/workflows/profile.yml]
   schedule:
-    - cron: "17 3 * * *"
+    - cron: "17 */3 * * *"
   workflow_dispatch:
 
 permissions:

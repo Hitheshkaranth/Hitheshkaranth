@@ -49,7 +49,7 @@ PROJECTS = {
         tagline="A trading terminal you own.",
         desc="A self-hosted financial terminal for traders, researchers and quant teams: multi-market data, "
              "pro charting, derivatives analytics, risk, backtesting, paper trading and an AI research agent.",
-        meta="TypeScript · React · Python · FastAPI", badge="MIT"),
+        meta="TypeScript · React · Python · FastAPI", badge="MIT", award="Stanford × DeepMind Hackathon"),
     "opentokenmonitor": dict(repo="OpenTokenMonitor", logo="opentokenmonitor.png", accent="#0a84ff",
         eyebrow="Open source", title="OpenTokenMonitor",
         desc="A local-first desktop widget for Claude, Codex and Gemini usage. Quotas, trends and cost "

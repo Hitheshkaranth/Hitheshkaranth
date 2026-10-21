@@ -481,8 +481,9 @@ def stack(t, theme):
 
 
 def link_button(t, kind):
-    label, ic, variant = {"x": ("@HitheshKaranth", "x", "outline"),
-                          "web": ("FlyVI Technologies", "globe", "outline"),
+    label, ic, variant = {"site": ("hitheshkaranth.dev", "globe", "outline"),
+                          "x": ("@HitheshKaranth", "x", "outline"),
+                          "web": ("FlyVI Technologies", "plane", "outline"),
                           "repos": ("Repositories", "folder", "outline"),
                           "github": ("Follow on GitHub", "github", "default")}[kind]
     w, b = button(t, 4, 4, label, variant, lead=ic, h=40)
@@ -529,7 +530,7 @@ def main():
             files[f"card-{k}-{theme}.svg"] = card(k, p, t, theme, counts, k in WIDE)
         for k, (a, b) in HEADINGS.items():
             files[f"h-{k}-{theme}.svg"] = heading(t, a, b, theme)
-        for k in ("github", "x", "web", "repos"):
+        for k in ("github", "site", "x", "web", "repos"):
             files[f"btn-{k}-{theme}.svg"] = link_button(t, k)
         for name, content in files.items():
             (OUT / name).write_text(content)

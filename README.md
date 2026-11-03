@@ -36,49 +36,14 @@ I lead technology at [FlyVI Technologies](https://www.flyvitech.com/), building 
 <br><br>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-train-dark.svg?v=22750c70">
-  <img src="./assets/gen/h-train-light.svg?v=22750c70" width="100%" alt="Custom model training">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-stack-dark.svg?v=22750c70">
+  <img src="./assets/gen/h-stack-light.svg?v=22750c70" width="100%" alt="Stack">
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-skanda-dark.svg?v=22750c70">
-  <img src="./assets/gen/card-skanda-light.svg?v=22750c70" width="100%" alt="Skanda Grounding: reads X-ray, CT and MRI, outlines every finding and explains each outline. Qwen3-VL-30B-A3B plus SAM 2.1, fine-tuned with LoRA on one DGX Spark. Private research.">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/stack-dark.svg?v=22750c70">
+  <img src="./assets/gen/stack-light.svg?v=22750c70" width="100%" alt="Stack, from silicon to intelligence: C, STM32, ESP32, LVGL; C++23, Rust, Qt 6, Embedded Linux, VxWorks, ARINC 615A; DO-178C, MISRA, CBMC, CodeQL, MC/DC; TypeScript, React, Tauri, Code-OSS, FastAPI, PySide6; Qwen3-VL, SAM 2.1, PEFT/LoRA, GRPO, MONAI, Grafana; vLLM, NVFP4/FP8, speculative decoding, voice AI, agents">
 </picture>
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/skanda-reads-dark.svg?v=22750c70">
-  <img src="./assets/gen/skanda-reads-light.svg?v=22750c70" width="100%" alt="Same held-out scan read by MedGemma 27B and by Skanda. Chest X-ray effusion: box overlap with the radiologist 0.50 vs 0.89. CT right lung tumour: 0.01 vs 0.91. MRI brain tumour: 0.24 vs 0.97.">
-</picture>
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/skanda-bench-dark.svg?v=22750c70">
-  <img src="./assets/gen/skanda-bench-light.svg?v=22750c70" width="100%" alt="Held-out benchmark, Skanda run 3 vs MedGemma 27B, percent. Chest X-ray: normals called normal 69 vs 72, right finding type 40.5 vs 41, box precision 25.5 vs 6. CT: 91 vs 6, 72 vs 49, 22 vs 1. MRI: 94 vs 2, 89 vs 42, 70 vs 6.">
-</picture>
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/skanda-pipeline-dark.svg?v=22750c70">
-  <img src="./assets/gen/skanda-pipeline-light.svg?v=22750c70" width="100%" alt="How Skanda is built: image into Qwen3-VL-30B-A3B (LoRA), a new [SEG] projector, then SAM 2.1's mask decoder draws one outline per finding. Trained in four gated stages on one DGX Spark: connector, 2D SFT, 3D volumes, X-ray polish. 26.8K training records from 7 licensed datasets.">
-</picture>
-
-<details>
-<summary><b>Training details</b></summary>
-<br>
-
-| | |
-|---|---|
-| **Backbone** | Qwen3-VL-30B-A3B-Instruct (31B MoE, ~3B active). LoRA r=64 on attention, LoRA on the vision encoder's last 11 of 27 blocks, trainable `[SEG]` rows at 20× LR |
-| **Grounding** | LISA-style `[SEG]` token → new 2048→2048→256 projector → SAM 2.1 Hiera-L mask decoder (weights from Sa2VA), image encoder frozen and cached |
-| **Heads** | Score head: p(abnormal) + 13 X-ray classes, drives a calibrated gate and a hint line before the report |
-| **Loss** | text CE (JSON boilerplate × 0.3) + 2.0 mask BCE + 0.5 mask Dice (3D Dice on volumes) + 0.2 object-score BCE + 0.5 score-head loss |
-| **Stages** | 0 connector → 1 2D SFT → 2 3D volumes (40% 2D replay, lesion-free volumes) → 3 X-ray polish (0.3× LR). A gate after every stage keeps it only if it matches the best so far |
-| **RL** | GRPO tried in runs 1–2 (reward = valid JSON + correct call + outline Dice + type/side); run 1's made every X-ray abnormal, run 2's was dropped by the gate |
-| **Data** | ChestX-Det, CheXmask, NIH ChestX-ray14, Medical Segmentation Decathlon, ISLES 2022, DeepLesion, autoPET. A lineage gate refuses non-commercial sets and model-written text; patient-level splits |
-| **Evidence** | Side, zone, size in mm, volume in mL and HU are measured from radiologist masks, never written by a model |
-| **Hardware** | 1× NVIDIA DGX Spark (GB10, 128 GB unified). Batch 1 × grad-accum 8, bf16, gradient checkpointing, ~80 GB in training, ~68 GB to serve |
-| **Next** | Run 4 is training: PTX-498, LUNA16, CRLM, HCC-TACE-Seg and SOOP to close the pneumothorax, nodule and liver gaps |
-
-<sub>Research use only. Skanda drafts findings for a radiologist to review; it is not a medical device.</sub>
-</details>
 
 <br><br>
 
@@ -194,14 +159,49 @@ I lead technology at [FlyVI Technologies](https://www.flyvitech.com/), building 
 <br><br>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-stack-dark.svg?v=22750c70">
-  <img src="./assets/gen/h-stack-light.svg?v=22750c70" width="100%" alt="Stack">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-train-dark.svg?v=22750c70">
+  <img src="./assets/gen/h-train-light.svg?v=22750c70" width="100%" alt="Custom model training">
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/stack-dark.svg?v=22750c70">
-  <img src="./assets/gen/stack-light.svg?v=22750c70" width="100%" alt="Stack, from silicon to intelligence: C, STM32, ESP32, LVGL; C++23, Rust, Qt 6, Embedded Linux, VxWorks, ARINC 615A; DO-178C, MISRA, CBMC, CodeQL, MC/DC; TypeScript, React, Tauri, Code-OSS, FastAPI, PySide6; vLLM, NVFP4/FP8, speculative decoding, voice AI, agents">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-skanda-dark.svg?v=22750c70">
+  <img src="./assets/gen/card-skanda-light.svg?v=22750c70" width="100%" alt="Skanda Grounding: reads X-ray, CT and MRI, outlines every finding and explains each outline. Qwen3-VL-30B-A3B plus SAM 2.1, fine-tuned with LoRA on one DGX Spark. Private research.">
 </picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/skanda-reads-dark.svg?v=22750c70">
+  <img src="./assets/gen/skanda-reads-light.svg?v=22750c70" width="100%" alt="Same held-out scan read by MedGemma 27B and by Skanda. Chest X-ray effusion: box overlap with the radiologist 0.50 vs 0.89. CT right lung tumour: 0.01 vs 0.91. MRI brain tumour: 0.24 vs 0.97.">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/skanda-bench-dark.svg?v=22750c70">
+  <img src="./assets/gen/skanda-bench-light.svg?v=22750c70" width="100%" alt="Held-out benchmark, Skanda run 3 vs MedGemma 27B, percent. Chest X-ray: normals called normal 69 vs 72, right finding type 40.5 vs 41, box precision 25.5 vs 6. CT: 91 vs 6, 72 vs 49, 22 vs 1. MRI: 94 vs 2, 89 vs 42, 70 vs 6.">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/skanda-pipeline-dark.svg?v=22750c70">
+  <img src="./assets/gen/skanda-pipeline-light.svg?v=22750c70" width="100%" alt="How Skanda is built: image into Qwen3-VL-30B-A3B (LoRA), a new [SEG] projector, then SAM 2.1's mask decoder draws one outline per finding. Trained in four gated stages on one DGX Spark: connector, 2D SFT, 3D volumes, X-ray polish. 26.8K training records from 7 licensed datasets.">
+</picture>
+
+<details>
+<summary><b>Training details</b></summary>
+<br>
+
+| | |
+|---|---|
+| **Backbone** | Qwen3-VL-30B-A3B-Instruct (31B MoE, ~3B active). LoRA r=64 on attention, LoRA on the vision encoder's last 11 of 27 blocks, trainable `[SEG]` rows at 20× LR |
+| **Grounding** | LISA-style `[SEG]` token → new 2048→2048→256 projector → SAM 2.1 Hiera-L mask decoder (weights from Sa2VA), image encoder frozen and cached |
+| **Heads** | Score head: p(abnormal) + 13 X-ray classes, drives a calibrated gate and a hint line before the report |
+| **Loss** | text CE (JSON boilerplate × 0.3) + 2.0 mask BCE + 0.5 mask Dice (3D Dice on volumes) + 0.2 object-score BCE + 0.5 score-head loss |
+| **Stages** | 0 connector → 1 2D SFT → 2 3D volumes (40% 2D replay, lesion-free volumes) → 3 X-ray polish (0.3× LR). A gate after every stage keeps it only if it matches the best so far |
+| **RL** | GRPO tried in runs 1–2 (reward = valid JSON + correct call + outline Dice + type/side); run 1's made every X-ray abnormal, run 2's was dropped by the gate |
+| **Data** | ChestX-Det, CheXmask, NIH ChestX-ray14, Medical Segmentation Decathlon, ISLES 2022, DeepLesion, autoPET. A lineage gate refuses non-commercial sets and model-written text; patient-level splits |
+| **Evidence** | Side, zone, size in mm, volume in mL and HU are measured from radiologist masks, never written by a model |
+| **Hardware** | 1× NVIDIA DGX Spark (GB10, 128 GB unified). Batch 1 × grad-accum 8, bf16, gradient checkpointing, ~80 GB in training, ~68 GB to serve |
+| **Next** | Run 4 is training: PTX-498, LUNA16, CRLM, HCC-TACE-Seg and SOOP to close the pneumothorax, nodule and liver gaps |
+
+<sub>Research use only. Skanda drafts findings for a radiologist to review; it is not a medical device.</sub>
+</details>
 
 <br><br>
 

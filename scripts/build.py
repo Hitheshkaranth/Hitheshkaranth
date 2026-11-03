@@ -146,10 +146,22 @@ def tw(text, size, weight=400):
     return len(text) * size * (0.55 if weight >= 600 else 0.5)
 
 
+# Shared motion. Rule: nothing that carries information starts hidden, because some
+# viewers (previews, paused or headless renderers) only ever show the first frame.
+# Motion lives in overlays and decoration; `gx` only draws in purely decorative lines.
+EASE = "cubic-bezier(.2,.7,.2,1)"
+MOTION = (f".gx{{transform-box:fill-box;transform-origin:left center;animation:gx 1s {EASE} backwards}}@keyframes gx{{from{{transform:scaleX(0)}}}}"
+          "@media (prefers-reduced-motion:reduce){*{animation:none!important}}")
+
+
+def delay(sec):
+    return f' style="animation-delay:{sec:.2f}s"'
+
+
 def svg(w, h, body, defs="", style=""):
     return (f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
             f'width="{w}" height="{h}" viewBox="0 0 {w} {h}" font-family="{FONT}">'
-            f'<style>{style}</style><defs>{defs}</defs>{body}</svg>\n')
+            f'<style>{style}{MOTION}</style><defs>{defs}</defs>{body}</svg>\n')
 
 
 def shadow_sm(t, fid="sm"):
@@ -255,7 +267,11 @@ def card(key, p, t, theme, star_counts, wide):
     body = frame(t, W, H)
     ls = 64 if wide else 48
     d, lb = logo_box(p, t, 32, 32, ls)
-    defs += d
+    defs += d + (f'<radialGradient id="halo"><stop offset="0" stop-color="{p["accent"]}" stop-opacity="{.38 if theme == "dark" else .24}"/>'
+                 f'<stop offset="1" stop-color="{p["accent"]}" stop-opacity="0"/></radialGradient>')
+    style = "@keyframes halo{50%{opacity:.45}}.halo{animation:halo 7s ease-in-out infinite}"
+    body += (f'<circle cx="{32 + ls / 2}" cy="{32 + ls / 2}" r="{ls * 1.25}" fill="url(#halo)" class="halo"/>'
+             f'<line x1="24" y1="9" x2="{W - 24}" y2="9" stroke="{p["accent"]}" stroke-width="2" stroke-linecap="round" class="gx"{delay(.15)}/>')
     body += lb
     tx = 32 + ls + 18
 
@@ -312,7 +328,7 @@ def card(key, p, t, theme, star_counts, wide):
         label = "View repository" if p.get("repo") else "Read announcement"
         w, _ = button(t, 0, 0, label, "outline", trail="arrow")
         body += button(t, W - 32 - w, sy + 16, label, "outline", trail="arrow")[1]
-    return svg(W, H, body, defs)
+    return svg(W, H, body, defs, style)
 
 
 # ── Skanda: custom model training ────────────────────────────────────────────
@@ -336,7 +352,10 @@ def skanda_bench(t, theme):
     """Grouped horizontal bars with direct value labels: colour is never the only cue."""
     W, H = 1200, 432
     acc, base = SKANDA[theme], BASE[theme]
-    defs = shadow_sm(t)
+    defs = shadow_sm(t) + ('<linearGradient id="shine"><stop offset="0" stop-color="#fff" stop-opacity="0"/>'
+                           '<stop offset=".6" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>')
+    style = (f"@keyframes shine{{0%{{transform:translateX(0)}}45%,100%{{transform:translateX({W // 3}px)}}}}"
+             f".shine{{animation:shine 4.5s {EASE} infinite}}")
     body = frame(t, W, H)
     body += (f'<text x="32" y="56" font-size="20" font-weight="600" letter-spacing="-0.4" fill="{t["fg"]}">Held-out benchmark</text>'
              f'<text x="32" y="80" font-size="14" fill="{t["muted_fg"]}">Skanda run 3 vs MedGemma 27B · same runner and scorer for every model · % (higher is better)</text>')
@@ -364,11 +383,16 @@ def skanda_bench(t, theme):
                          f'<rect x="{x:.0f}" y="{by}" width="{max(bw * v / 100, 3):.1f}" height="12" rx="3" fill="{c}"/>'
                          f'<text x="{x + bw + 10:.0f}" y="{by + 11}" font-size="13" font-weight="{600 if strong else 400}" '
                          f'fill="{t["fg"] if strong else t["muted_fg"]}">{fmt(v)}</text>')
+                if strong:  # a shine runs along Skanda's bar, clipped to it
+                    cid = f"bar{i}{y}"
+                    defs += f'<clipPath id="{cid}"><rect x="{x:.0f}" y="{by}" width="{max(bw * v / 100, 3):.1f}" height="12" rx="3"/></clipPath>'
+                    body += (f'<g clip-path="url(#{cid})"><rect x="{x - 80:.0f}" y="{by}" width="80" height="12" fill="url(#shine)" '
+                             f'class="shine"{delay(i * .4 + (y - 168) / 76 * .25)}/></g>')
             y += 76
     body += (f'<line x1="9" y1="{H - 62}" x2="{W - 9}" y2="{H - 62}" stroke="{t["border"]}"/>'
              f'<text x="32" y="{H - 34}" font-size="13" fill="{t["muted_fg"]}">CT and MRI: Skanda names the right finding 72% / 89% of the time and clears 91% / 94% of lesion-free scans. '
              f'Chest X-ray is a trade: small test set (±10 pts).</text>')
-    return svg(W, H, body, defs)
+    return svg(W, H, body, defs, style)
 
 
 def jpeg_uri(name):
@@ -382,7 +406,8 @@ def skanda_reads(t, theme):
     cases = [("xray", "Chest X-ray", "effusion + consolidation", "0.50", "0.89"),
              ("ct", "CT", "right lung tumour", "0.01", "0.91"),
              ("mri", "MRI", "brain tumour with oedema", "0.24", "0.97")]
-    defs = shadow_sm(t)
+    defs = shadow_sm(t) + (f'<linearGradient id="scanG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{acc}" stop-opacity="0"/>'
+                           f'<stop offset="1" stop-color="{acc}" stop-opacity=".35"/></linearGradient>')
     body = frame(t, W, H)
     body += (f'<text x="32" y="56" font-size="20" font-weight="600" letter-spacing="-0.4" fill="{t["fg"]}">Same scan, two readers</text>'
              f'<text x="32" y="80" font-size="14" fill="{t["muted_fg"]}">Saved benchmark reads on held-out cases. IoU = box overlap with the radiologist&apos;s outline.</text>')
@@ -401,6 +426,12 @@ def skanda_reads(t, theme):
                      f'<rect x="{ix + .5}" y="{iy + .5}" width="{im - 1}" height="{im - 1}" rx="10" fill="none" stroke="{acc if strong else t["border"]}" stroke-width="{1.5 if strong else 1}"/>'
                      f'<text x="{ix}" y="{iy + im + 22}" font-size="13" fill="{t["muted_fg"]}">{who}</text>'
                      f'<text x="{ix + im}" y="{iy + im + 22}" text-anchor="end" font-size="13" font-weight="{600 if strong else 400}" fill="{t["fg"] if strong else t["muted_fg"]}">IoU {iou}</text>')
+            if strong:  # a reading sweep over Skanda's image, then a pause
+                body += (f'<g clip-path="url(#{cid})"><g class="scan"{delay(i * .5)}>'
+                         f'<rect x="{ix}" y="{iy - 44}" width="{im}" height="44" fill="url(#scanG)"/>'
+                         f'<line x1="{ix}" y1="{iy - .75}" x2="{ix + im}" y2="{iy - .75}" stroke="{acc}" stroke-width="1.5"/></g></g>')
+    style = (f"@keyframes scan{{0%{{transform:translateY(0);opacity:0}}6%{{opacity:1}}55%{{transform:translateY({im + 44}px);opacity:1}}"
+             f"56%,100%{{transform:translateY({im + 44}px);opacity:0}}}}.scan{{animation:scan 5s {EASE} infinite backwards}}")
     # legend: line style + colour + words
     ly = H - 34
     body += f'<line x1="9" y1="{H - 62}" x2="{W - 9}" y2="{H - 62}" stroke="{t["border"]}"/>'
@@ -411,7 +442,7 @@ def skanda_reads(t, theme):
              f'<line x1="330" y1="{ly - 4}" x2="354" y2="{ly - 4}" stroke="#38bdf8" stroke-width="3"/>'
              f'<text x="362" y="{ly}" font-size="13" fill="{t["muted_fg"]}">Skanda outline + box</text>'
              f'<text x="{W - 32}" y="{ly}" text-anchor="end" font-size="13" fill="{t["muted_fg"]}">Cases chosen by a fixed rule; the benchmark shows how often.</text>')
-    return svg(W, H, body, defs)
+    return svg(W, H, body, defs, style)
 
 
 def hero(t, theme):
@@ -502,7 +533,7 @@ def hero(t, theme):
              f".sel{{animation:sel {n * 1.6}s cubic-bezier(.4,0,.2,1) infinite}}"
              "@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}.caret{animation:blink 1.1s steps(1) infinite}"
              "@keyframes aura{50%{opacity:.6}}.aura{animation:aura 8s ease-in-out infinite}"
-             "@media (prefers-reduced-motion:reduce){*{animation:none!important}}")
+             )
     return svg(W, H, body, defs, style)
 
 
@@ -540,7 +571,7 @@ def heading(t, title, sub, theme):
 
 def inference(t, theme):
     """Three shadcn dashboard stat cards."""
-    W, H = 1200, 196
+    W, H = 1200, 216
     cols = [("Ornith-1.5", "351.7", "tok/s aggregate · 16 users", "NVFP4 + FP8 + MTP · vision", True),
             ("Qwen3.8 Distill", "373", "tok/s aggregate · 16 users", "Self-quantized, data-free", False),
             ("Qwen3.6", "219", "tok/s peak · 12 users", "Prefix cache, 5.1× faster", False)]
@@ -555,12 +586,17 @@ def inference(t, theme):
                  + f'<text x="{x + 24:.0f}" y="100" font-size="40" font-weight="700" letter-spacing="-1.2" fill="{t["fg"]}">{num}</text>'
                  f'<text x="{x + 24:.0f}" y="128" font-size="13" fill="{t["muted_fg"]}">{unit}</text>'
                  f'<text x="{x + 24:.0f}" y="160" font-size="13" fill="{t["muted_fg"]}">{note}</text>')
+        bw, fw = cw - 48, (cw - 48) * float(num) / 400  # scale: 400 tok/s
+        body += (f'<rect x="{x + 24:.0f}" y="178" width="{bw:.0f}" height="6" rx="3" fill="{t["muted"]}"/>'
+                 f'<g><rect x="{x + 24:.0f}" y="178" width="{fw:.0f}" height="6" rx="3" fill="#76b900"/>'
+                 f'<line x1="{x + 27:.0f}" y1="181" x2="{x + 21 + fw:.0f}" y2="181" stroke="{t["card"]}" stroke-opacity=".55" stroke-width="6" stroke-dasharray="2 12" class="flow"/></g>')
         if live:
             nw = tw(num, 40, 700) - 8
             body += (f'<rect x="{x + 24 + nw + 14:.0f}" y="76" width="56" height="22" rx="11" fill="{t["live_bg"]}"/>'
                      f'<circle cx="{x + 24 + nw + 26:.0f}" cy="87" r="3.5" fill="#22c55e" class="pulse"/>'
                      f'<text x="{x + 24 + nw + 34:.0f}" y="91.5" font-size="12" font-weight="600" fill="{t["live_fg"]}">Live</text>')
-    style = "@keyframes pulse{50%{opacity:.3}}.pulse{animation:pulse 1.8s ease-in-out infinite}"
+    style = ("@keyframes pulse{50%{opacity:.3}}.pulse{animation:pulse 1.8s ease-in-out infinite}"
+             "@keyframes flow{to{stroke-dashoffset:-28}}.flow{animation:flow 1.1s linear infinite}")
     return svg(W, H, body, defs, style)
 
 

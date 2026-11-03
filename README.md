@@ -2,8 +2,8 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/hero-dark.svg?v=aa75e70e">
-    <img src="./assets/gen/hero-light.svg?v=aa75e70e" width="100%" alt="Hithesh Karanth. From silicon to intelligence, built to be verified. A command menu lists the stack: silicon, firmware, avionics, assurance, tools and intelligence.">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/hero-dark.svg?v=22750c70">
+    <img src="./assets/gen/hero-light.svg?v=22750c70" width="100%" alt="Hithesh Karanth. From silicon to intelligence, built to be verified. A command menu lists the stack: silicon, firmware, avionics, assurance, tools, training and intelligence.">
   </picture>
 </p>
 
@@ -22,152 +22,199 @@
 <br>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-about-dark.svg?v=aa75e70e">
-  <img src="./assets/gen/h-about-light.svg?v=aa75e70e" width="100%" alt="About">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-about-dark.svg?v=22750c70">
+  <img src="./assets/gen/h-about-light.svg?v=22750c70" width="100%" alt="About">
 </picture>
 
-I lead technology at [FlyVI Technologies](https://www.flyvitech.com/), building high-reliability aerospace, defence, power-electronics and embedded-control systems. Outside of that I build developer tools, financial infrastructure, applied-AI products and self-hosted LLM inference, mostly in the open.
+I lead technology at [FlyVI Technologies](https://www.flyvitech.com/), building high-reliability aerospace, defence, power-electronics and embedded-control systems. Outside of that I build developer tools, financial infrastructure, applied-AI products and self-hosted LLM inference, mostly in the open, and I train my own models: **Skanda**, a grounded radiology model fine-tuned end to end on a single DGX Spark.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/bento-dark.svg?v=aa75e70e">
-  <img src="./assets/gen/bento-light.svg?v=aa75e70e" width="100%" alt="Aerospace and defence, embedded systems, developer tools, applied AI, MLOps and inference">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/bento-dark.svg?v=22750c70">
+  <img src="./assets/gen/bento-light.svg?v=22750c70" width="100%" alt="Aerospace and defence, embedded systems, developer tools, model training, MLOps and inference">
 </picture>
 
 <br><br>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-now-dark.svg?v=aa75e70e">
-  <img src="./assets/gen/h-now-light.svg?v=aa75e70e" width="100%" alt="Building now">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-train-dark.svg?v=22750c70">
+  <img src="./assets/gen/h-train-light.svg?v=22750c70" width="100%" alt="Custom model training">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-skanda-dark.svg?v=22750c70">
+  <img src="./assets/gen/card-skanda-light.svg?v=22750c70" width="100%" alt="Skanda Grounding: reads X-ray, CT and MRI, outlines every finding and explains each outline. Qwen3-VL-30B-A3B plus SAM 2.1, fine-tuned with LoRA on one DGX Spark. Private research.">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/skanda-reads-dark.svg?v=22750c70">
+  <img src="./assets/gen/skanda-reads-light.svg?v=22750c70" width="100%" alt="Same held-out scan read by MedGemma 27B and by Skanda. Chest X-ray effusion: box overlap with the radiologist 0.50 vs 0.89. CT right lung tumour: 0.01 vs 0.91. MRI brain tumour: 0.24 vs 0.97.">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/skanda-bench-dark.svg?v=22750c70">
+  <img src="./assets/gen/skanda-bench-light.svg?v=22750c70" width="100%" alt="Held-out benchmark, Skanda run 3 vs MedGemma 27B, percent. Chest X-ray: normals called normal 69 vs 72, right finding type 40.5 vs 41, box precision 25.5 vs 6. CT: 91 vs 6, 72 vs 49, 22 vs 1. MRI: 94 vs 2, 89 vs 42, 70 vs 6.">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/skanda-pipeline-dark.svg?v=22750c70">
+  <img src="./assets/gen/skanda-pipeline-light.svg?v=22750c70" width="100%" alt="How Skanda is built: image into Qwen3-VL-30B-A3B (LoRA), a new [SEG] projector, then SAM 2.1's mask decoder draws one outline per finding. Trained in four gated stages on one DGX Spark: connector, 2D SFT, 3D volumes, X-ray polish. 26.8K training records from 7 licensed datasets.">
+</picture>
+
+<details>
+<summary><b>Training details</b></summary>
+<br>
+
+| | |
+|---|---|
+| **Backbone** | Qwen3-VL-30B-A3B-Instruct (31B MoE, ~3B active). LoRA r=64 on attention, LoRA on the vision encoder's last 11 of 27 blocks, trainable `[SEG]` rows at 20× LR |
+| **Grounding** | LISA-style `[SEG]` token → new 2048→2048→256 projector → SAM 2.1 Hiera-L mask decoder (weights from Sa2VA), image encoder frozen and cached |
+| **Heads** | Score head: p(abnormal) + 13 X-ray classes, drives a calibrated gate and a hint line before the report |
+| **Loss** | text CE (JSON boilerplate × 0.3) + 2.0 mask BCE + 0.5 mask Dice (3D Dice on volumes) + 0.2 object-score BCE + 0.5 score-head loss |
+| **Stages** | 0 connector → 1 2D SFT → 2 3D volumes (40% 2D replay, lesion-free volumes) → 3 X-ray polish (0.3× LR). A gate after every stage keeps it only if it matches the best so far |
+| **RL** | GRPO tried in runs 1–2 (reward = valid JSON + correct call + outline Dice + type/side); run 1's made every X-ray abnormal, run 2's was dropped by the gate |
+| **Data** | ChestX-Det, CheXmask, NIH ChestX-ray14, Medical Segmentation Decathlon, ISLES 2022, DeepLesion, autoPET. A lineage gate refuses non-commercial sets and model-written text; patient-level splits |
+| **Evidence** | Side, zone, size in mm, volume in mL and HU are measured from radiologist masks, never written by a model |
+| **Hardware** | 1× NVIDIA DGX Spark (GB10, 128 GB unified). Batch 1 × grad-accum 8, bf16, gradient checkpointing, ~80 GB in training, ~68 GB to serve |
+| **Next** | Run 4 is training: PTX-498, LUNA16, CRLM, HCC-TACE-Seg and SOOP to close the pneumothorax, nodule and liver gaps |
+
+<sub>Research use only. Skanda drafts findings for a radiologist to review; it is not a medical device.</sub>
+</details>
+
+<br><br>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-now-dark.svg?v=22750c70">
+  <img src="./assets/gen/h-now-light.svg?v=22750c70" width="100%" alt="Building now">
 </picture>
 
 <a href="https://github.com/Hitheshkaranth/noyce-ide-dist">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-noyce-dark.svg?v=aa75e70e">
-    <img src="./assets/gen/card-noyce-light.svg?v=aa75e70e" width="100%" alt="Noyce IDE: an AI-native Code-OSS workbench for safety-critical firmware">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-noyce-dark.svg?v=22750c70">
+    <img src="./assets/gen/card-noyce-light.svg?v=22750c70" width="100%" alt="Noyce IDE: an AI-native Code-OSS workbench for safety-critical firmware">
   </picture>
 </a>
 
 <br><br>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-award-dark.svg?v=aa75e70e">
-  <img src="./assets/gen/h-award-light.svg?v=aa75e70e" width="100%" alt="Recognition">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-award-dark.svg?v=22750c70">
+  <img src="./assets/gen/h-award-light.svg?v=22750c70" width="100%" alt="Recognition">
 </picture>
 
 <a href="https://www.linkedin.com/posts/vinayakgavariya_buildwithsarvam-activity-7493728077878001664-BYc-">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-wirevoice-dark.svg?v=aa75e70e">
-    <img src="./assets/gen/card-wirevoice-light.svg?v=aa75e70e" width="100%" alt="WireVoice, winner of the Sarvam Epoch Buildathon 2026: a voice-first assistant for wiring harness drawings">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-wirevoice-dark.svg?v=22750c70">
+    <img src="./assets/gen/card-wirevoice-light.svg?v=22750c70" width="100%" alt="WireVoice, winner of the Sarvam Epoch Buildathon 2026: a voice-first assistant for wiring harness drawings">
   </picture>
 </a>
 
 <br><br>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-oss-dark.svg?v=aa75e70e">
-  <img src="./assets/gen/h-oss-light.svg?v=aa75e70e" width="100%" alt="Open source">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-oss-dark.svg?v=22750c70">
+  <img src="./assets/gen/h-oss-light.svg?v=22750c70" width="100%" alt="Open source">
 </picture>
 
 <a href="https://github.com/Hitheshkaranth/OpenTerminalUI">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-openterminalui-dark.svg?v=aa75e70e">
-    <img src="./assets/gen/card-openterminalui-light.svg?v=aa75e70e" width="100%" alt="OpenTerminalUI: a self-hosted financial terminal">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-openterminalui-dark.svg?v=22750c70">
+    <img src="./assets/gen/card-openterminalui-light.svg?v=22750c70" width="100%" alt="OpenTerminalUI: a self-hosted financial terminal">
   </picture>
 </a>
 <a href="https://github.com/Hitheshkaranth/OpenTokenMonitor">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-opentokenmonitor-dark.svg?v=aa75e70e">
-    <img src="./assets/gen/card-opentokenmonitor-light.svg?v=aa75e70e" width="49.5%" alt="OpenTokenMonitor: a local-first monitor for AI coding tool usage">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-opentokenmonitor-dark.svg?v=22750c70">
+    <img src="./assets/gen/card-opentokenmonitor-light.svg?v=22750c70" width="49.5%" alt="OpenTokenMonitor: a local-first monitor for AI coding tool usage">
   </picture>
 </a>
 <a href="https://github.com/Hitheshkaranth/EmbeddedDisplayStudio">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-eds-dark.svg?v=aa75e70e">
-    <img src="./assets/gen/card-eds-light.svg?v=aa75e70e" width="49.5%" alt="EmbeddedDisplayStudio: ship HMI screens to embedded Linux panels">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-eds-dark.svg?v=22750c70">
+    <img src="./assets/gen/card-eds-light.svg?v=22750c70" width="49.5%" alt="EmbeddedDisplayStudio: ship HMI screens to embedded Linux panels">
   </picture>
 </a>
 
 <br><br>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-systems-dark.svg?v=aa75e70e">
-  <img src="./assets/gen/h-systems-light.svg?v=aa75e70e" width="100%" alt="Systems work">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-systems-dark.svg?v=22750c70">
+  <img src="./assets/gen/h-systems-light.svg?v=22750c70" width="100%" alt="Systems work">
 </picture>
 
 <a href="https://github.com/Hitheshkaranth/arinc-615a-cli-tool-suite">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-arinc-dark.svg?v=aa75e70e">
-    <img src="./assets/gen/card-arinc-light.svg?v=aa75e70e" width="100%" alt="ARINC 615A Tool Suite: avionics software loading over Ethernet">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-arinc-dark.svg?v=22750c70">
+    <img src="./assets/gen/card-arinc-light.svg?v=22750c70" width="100%" alt="ARINC 615A Tool Suite: avionics software loading over Ethernet">
   </picture>
 </a>
 <a href="https://github.com/Hitheshkaranth/Netra_System_Debugger_V1">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-netra-debugger-dark.svg?v=aa75e70e">
-    <img src="./assets/gen/card-netra-debugger-light.svg?v=aa75e70e" width="49.5%" alt="NETRA System Debugger: telemetry diagnostics and a live 3D digital twin">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-netra-debugger-dark.svg?v=22750c70">
+    <img src="./assets/gen/card-netra-debugger-light.svg?v=22750c70" width="49.5%" alt="NETRA System Debugger: telemetry diagnostics and a live 3D digital twin">
   </picture>
 </a>
 <a href="https://github.com/Hitheshkaranth/Netra_Device_Firmware_V1">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-netra-device-dark.svg?v=aa75e70e">
-    <img src="./assets/gen/card-netra-device-light.svg?v=aa75e70e" width="49.5%" alt="NETRA Device Firmware: ESP32-C6 ultrasonic ranging and motion telemetry">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-netra-device-dark.svg?v=22750c70">
+    <img src="./assets/gen/card-netra-device-light.svg?v=22750c70" width="49.5%" alt="NETRA Device Firmware: ESP32-C6 ultrasonic ranging and motion telemetry">
   </picture>
 </a>
 
 <br><br>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-mlops-dark.svg?v=aa75e70e">
-  <img src="./assets/gen/h-mlops-light.svg?v=aa75e70e" width="100%" alt="Inference">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-mlops-dark.svg?v=22750c70">
+  <img src="./assets/gen/h-mlops-light.svg?v=22750c70" width="100%" alt="Inference">
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/inference-dark.svg?v=aa75e70e">
-  <img src="./assets/gen/inference-light.svg?v=aa75e70e" width="100%" alt="Three DGX Spark deployments: Ornith-1.5 at 351.7 tok/s across 16 users, Qwen3.8 Distill at 373 tok/s across 16 users, Qwen3.6 at 219 tok/s peak, all at 262K context">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/inference-dark.svg?v=22750c70">
+  <img src="./assets/gen/inference-light.svg?v=22750c70" width="100%" alt="Three DGX Spark deployments: Ornith-1.5 at 351.7 tok/s across 16 users, Qwen3.8 Distill at 373 tok/s across 16 users, Qwen3.6 at 219 tok/s peak, all at 262K context">
 </picture>
 
 <a href="https://github.com/Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-ornith-dark.svg?v=aa75e70e">
-    <img src="./assets/gen/card-ornith-light.svg?v=aa75e70e" width="100%" alt="Ornith-1.5-35B-A3B on DGX Spark">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-ornith-dark.svg?v=22750c70">
+    <img src="./assets/gen/card-ornith-light.svg?v=22750c70" width="100%" alt="Ornith-1.5-35B-A3B on DGX Spark">
   </picture>
 </a>
 <a href="https://github.com/Hitheshkaranth/Qwen-3_8_A3B_Model_DGX_Spark_Setup">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-qwen38-dark.svg?v=aa75e70e">
-    <img src="./assets/gen/card-qwen38-light.svg?v=aa75e70e" width="49.5%" alt="Qwen3.8-35B-A3B Distill, self-quantized">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-qwen38-dark.svg?v=22750c70">
+    <img src="./assets/gen/card-qwen38-light.svg?v=22750c70" width="49.5%" alt="Qwen3.8-35B-A3B Distill, self-quantized">
   </picture>
 </a>
 <a href="https://github.com/Hitheshkaranth/Qwen-3_6_Model_DGX_Spark_Setup">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-qwen36-dark.svg?v=aa75e70e">
-    <img src="./assets/gen/card-qwen36-light.svg?v=aa75e70e" width="49.5%" alt="Qwen3.6-35B-A3B-NVFP4 production recipe">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/card-qwen36-dark.svg?v=22750c70">
+    <img src="./assets/gen/card-qwen36-light.svg?v=22750c70" width="49.5%" alt="Qwen3.6-35B-A3B-NVFP4 production recipe">
   </picture>
 </a>
 
 <br><br>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-stack-dark.svg?v=aa75e70e">
-  <img src="./assets/gen/h-stack-light.svg?v=aa75e70e" width="100%" alt="Stack">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-stack-dark.svg?v=22750c70">
+  <img src="./assets/gen/h-stack-light.svg?v=22750c70" width="100%" alt="Stack">
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/stack-dark.svg?v=aa75e70e">
-  <img src="./assets/gen/stack-light.svg?v=aa75e70e" width="100%" alt="Stack, from silicon to intelligence: C, STM32, ESP32, LVGL; C++23, Rust, Qt 6, Embedded Linux, VxWorks, ARINC 615A; DO-178C, MISRA, CBMC, CodeQL, MC/DC; TypeScript, React, Tauri, Code-OSS, FastAPI, PySide6; vLLM, NVFP4/FP8, speculative decoding, voice AI, agents">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/stack-dark.svg?v=22750c70">
+  <img src="./assets/gen/stack-light.svg?v=22750c70" width="100%" alt="Stack, from silicon to intelligence: C, STM32, ESP32, LVGL; C++23, Rust, Qt 6, Embedded Linux, VxWorks, ARINC 615A; DO-178C, MISRA, CBMC, CodeQL, MC/DC; TypeScript, React, Tauri, Code-OSS, FastAPI, PySide6; vLLM, NVFP4/FP8, speculative decoding, voice AI, agents">
 </picture>
 
 <br><br>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-stars-dark.svg?v=aa75e70e">
-  <img src="./assets/gen/h-stars-light.svg?v=aa75e70e" width="100%" alt="Star history">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/h-stars-dark.svg?v=22750c70">
+  <img src="./assets/gen/h-stars-light.svg?v=22750c70" width="100%" alt="Star history">
 </picture>
 
 <p align="center">
   <a href="https://www.star-history.com/#Hitheshkaranth/OpenTerminalUI&Hitheshkaranth/OpenTokenMonitor&Hitheshkaranth/EmbeddedDisplayStudio&Hitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup&Date">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio%2CHitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup&type=Date&theme=dark&v=20261102">
-      <img src="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio%2CHitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup&type=Date&v=20261102" width="100%" alt="Star history for OpenTerminalUI, OpenTokenMonitor, EmbeddedDisplayStudio and Ornith-1.5">
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio%2CHitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup&type=Date&theme=dark&v=20261103">
+      <img src="https://api.star-history.com/svg?repos=Hitheshkaranth/OpenTerminalUI%2CHitheshkaranth/OpenTokenMonitor%2CHitheshkaranth/EmbeddedDisplayStudio%2CHitheshkaranth/Ornith-1.5_A3B_Model_DGX_Spark_Setup&type=Date&v=20261103" width="100%" alt="Star history for OpenTerminalUI, OpenTokenMonitor, EmbeddedDisplayStudio and Ornith-1.5">
     </picture>
   </a>
 </p>
@@ -175,16 +222,16 @@ I lead technology at [FlyVI Technologies](https://www.flyvitech.com/), building 
 <br>
 
 <p align="center">
-  <a href="https://hitheshkaranth.dev/"><picture><source media="(prefers-color-scheme: dark)" srcset="./assets/gen/btn-site-dark.svg?v=aa75e70e"><img src="./assets/gen/btn-site-light.svg?v=aa75e70e" height="48" alt="Personal website: hitheshkaranth.dev"></picture></a>
-  <a href="https://x.com/HitheshKaranth"><picture><source media="(prefers-color-scheme: dark)" srcset="./assets/gen/btn-x-dark.svg?v=aa75e70e"><img src="./assets/gen/btn-x-light.svg?v=aa75e70e" height="48" alt="X"></picture></a>
-  <a href="https://www.flyvitech.com/"><picture><source media="(prefers-color-scheme: dark)" srcset="./assets/gen/btn-web-dark.svg?v=aa75e70e"><img src="./assets/gen/btn-web-light.svg?v=aa75e70e" height="48" alt="FlyVI Technologies website"></picture></a>
-  <a href="https://github.com/Hitheshkaranth?tab=repositories"><picture><source media="(prefers-color-scheme: dark)" srcset="./assets/gen/btn-repos-dark.svg?v=aa75e70e"><img src="./assets/gen/btn-repos-light.svg?v=aa75e70e" height="48" alt="Repositories"></picture></a>
-  <a href="https://github.com/Hitheshkaranth"><picture><source media="(prefers-color-scheme: dark)" srcset="./assets/gen/btn-github-dark.svg?v=aa75e70e"><img src="./assets/gen/btn-github-light.svg?v=aa75e70e" height="48" alt="Follow on GitHub"></picture></a>
+  <a href="https://hitheshkaranth.dev/"><picture><source media="(prefers-color-scheme: dark)" srcset="./assets/gen/btn-site-dark.svg?v=22750c70"><img src="./assets/gen/btn-site-light.svg?v=22750c70" height="48" alt="Personal website: hitheshkaranth.dev"></picture></a>
+  <a href="https://x.com/HitheshKaranth"><picture><source media="(prefers-color-scheme: dark)" srcset="./assets/gen/btn-x-dark.svg?v=22750c70"><img src="./assets/gen/btn-x-light.svg?v=22750c70" height="48" alt="X"></picture></a>
+  <a href="https://www.flyvitech.com/"><picture><source media="(prefers-color-scheme: dark)" srcset="./assets/gen/btn-web-dark.svg?v=22750c70"><img src="./assets/gen/btn-web-light.svg?v=22750c70" height="48" alt="FlyVI Technologies website"></picture></a>
+  <a href="https://github.com/Hitheshkaranth?tab=repositories"><picture><source media="(prefers-color-scheme: dark)" srcset="./assets/gen/btn-repos-dark.svg?v=22750c70"><img src="./assets/gen/btn-repos-light.svg?v=22750c70" height="48" alt="Repositories"></picture></a>
+  <a href="https://github.com/Hitheshkaranth"><picture><source media="(prefers-color-scheme: dark)" srcset="./assets/gen/btn-github-dark.svg?v=22750c70"><img src="./assets/gen/btn-github-light.svg?v=22750c70" height="48" alt="Follow on GitHub"></picture></a>
 </p>
 
 <p align="center"><sub>Open to collaboration on developer tools, financial infrastructure, voice AI, self-hosted inference, avionics and embedded systems.<br>Reach me through <a href="https://hitheshkaranth.dev/">hitheshkaranth.dev</a>, or start an issue or discussion on the relevant repository.</sub></p>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/footer-dark.svg?v=aa75e70e">
-  <img src="./assets/gen/footer-light.svg?v=aa75e70e" width="100%" alt="Thanks for stopping by.">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gen/footer-dark.svg?v=22750c70">
+  <img src="./assets/gen/footer-light.svg?v=22750c70" width="100%" alt="Thanks for stopping by.">
 </picture>

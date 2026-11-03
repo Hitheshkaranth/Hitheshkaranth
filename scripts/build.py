@@ -32,6 +32,13 @@ THEMES = {  # shadcn/ui zinc tokens
 # ── data ─────────────────────────────────────────────────────────────────────
 
 PROJECTS = {
+    "skanda": dict(repo=None, logo="skanda.png", accent="#0ea5e9", private=True,
+        eyebrow="Custom model", title="Skanda Grounding",
+        tagline="Reads X-ray, CT and MRI. Outlines every finding. Explains each outline.",
+        desc="A 31B vision-language model I fine-tuned end to end on one DGX Spark: Qwen3-VL-30B-A3B writes the "
+             "report, a [SEG] token per finding drives SAM 2.1 to draw the outline, and every number in the evidence "
+             "is measured from radiologist masks. Trained only on commercially licensed data.",
+        meta="Qwen3-VL · SAM 2.1 · LoRA · DGX Spark", stars=False),
     "noyce": dict(repo="noyce-ide-dist", logo="noyce-ide.png", accent="#40c8e0",
         eyebrow="Building now", title="Noyce IDE",
         tagline="Firmware you can prove.",
@@ -166,6 +173,8 @@ LUCIDE = {
     "chevron": '<path d="m9 18 6-6-6-6"/>',
     "globe": '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>',
     "folder": '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+    "scan": '<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="1"/><path d="M18.944 12.33a1 1 0 0 0 0-.66 7.5 7.5 0 0 0-13.888 0 1 1 0 0 0 0 .66 7.5 7.5 0 0 0 13.888 0"/>',
+    "layers": '<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
     "award": '<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>',
 }
 BRANDS = {  # filled marks, 24×24
@@ -297,14 +306,186 @@ def card(key, p, t, theme, star_counts, wide):
         w, b = badge(t, bx, sy + 23, tech, "outline")
         body += b
         bx += w + 6
-    label = "View repository" if p.get("repo") else "Read announcement"
-    w, _ = button(t, 0, 0, label, "outline", trail="arrow")
-    body += button(t, W - 32 - w, sy + 16, label, "outline", trail="arrow")[1]
+    if p.get("private"):  # private repo: say so instead of offering a link that 404s
+        w, _ = badge(t, 0, 0, "Private research · weights on request", "outline", lead="shield")
+        body += badge(t, W - 32 - w, sy + 23, "Private research · weights on request", "outline", lead="shield")[1]
+    else:
+        label = "View repository" if p.get("repo") else "Read announcement"
+        w, _ = button(t, 0, 0, label, "outline", trail="arrow")
+        body += button(t, W - 32 - w, sy + 16, label, "outline", trail="arrow")[1]
+    return svg(W, H, body, defs)
+
+
+# ── Skanda: custom model training ────────────────────────────────────────────
+
+SKANDA = {"light": "#0284c7", "dark": "#38bdf8"}   # sky, ≥4.5:1 on the card in both themes
+BASE = {"light": "#a1a1aa", "dark": "#52525b"}     # MedGemma baseline bars
+SEG_GOLD = "#eab308"                                # radiologist outline colour used in the reads
+
+# Held-out benchmark, % (higher is better). Skanda run 3 = the published checkpoint.
+# Source: skanda-grounding README, "Results" (same runner and scorer for every model).
+BENCH = [("Chest X-ray", "111 films", [("Normals called normal", 72, 69), ("Right finding type", 41, 40.5), ("Box precision", 6, 25.5)]),
+         ("CT", "340 cases", [("Normals called normal", 6, 91), ("Right finding type", 49, 72), ("Box precision", 1, 22)]),
+         ("MRI", "240 cases", [("Normals called normal", 2, 94), ("Right finding type", 42, 89), ("Box precision", 6, 70)])]
+
+
+def fmt(v):
+    return f"{v:g}"
+
+
+def skanda_bench(t, theme):
+    """Grouped horizontal bars with direct value labels: colour is never the only cue."""
+    W, H = 1200, 432
+    acc, base = SKANDA[theme], BASE[theme]
+    defs = shadow_sm(t)
+    body = frame(t, W, H)
+    body += (f'<text x="32" y="56" font-size="20" font-weight="600" letter-spacing="-0.4" fill="{t["fg"]}">Held-out benchmark</text>'
+             f'<text x="32" y="80" font-size="14" fill="{t["muted_fg"]}">Skanda run 3 vs MedGemma 27B · same runner and scorer for every model · % (higher is better)</text>')
+    # legend, top right
+    lx = W - 32 - 300
+    body += (f'<rect x="{lx}" y="44" width="14" height="10" rx="3" fill="{base}"/>'
+             f'<text x="{lx + 20}" y="54" font-size="13" fill="{t["muted_fg"]}">MedGemma 27B</text>'
+             f'<rect x="{lx + 140}" y="44" width="14" height="10" rx="3" fill="{acc}"/>'
+             f'<text x="{lx + 160}" y="54" font-size="13" font-weight="600" fill="{t["fg"]}">Skanda run 3</text>')
+    body += f'<line x1="9" y1="104" x2="{W - 9}" y2="104" stroke="{t["border"]}"/>'
+    pw, gap = (W - 64 - 2 * 32) / 3, 32
+    for i, (name, n, rows) in enumerate(BENCH):
+        x = 32 + i * (pw + gap)
+        if i:
+            body += f'<line x1="{x - gap / 2:.0f}" y1="124" x2="{x - gap / 2:.0f}" y2="{H - 74}" stroke="{t["border"]}"/>'
+        body += (f'<text x="{x:.0f}" y="138" font-size="16" font-weight="600" fill="{t["fg"]}">{name}</text>'
+                 f'<text x="{x + tw(name, 16, 600) + 10:.0f}" y="138" font-size="13" fill="{t["muted_fg"]}">{n}</text>')
+        bw = pw - 54  # room for the value label
+        y = 168
+        for label, mg, sk in rows:
+            body += f'<text x="{x:.0f}" y="{y}" font-size="13" fill="{t["muted_fg"]}">{label}</text>'
+            for j, (v, c, strong) in enumerate(((mg, base, False), (sk, acc, True))):
+                by = y + 10 + j * 18
+                body += (f'<rect x="{x:.0f}" y="{by}" width="{bw:.0f}" height="12" rx="3" fill="{t["muted"]}" fill-opacity=".6"/>'
+                         f'<rect x="{x:.0f}" y="{by}" width="{max(bw * v / 100, 3):.1f}" height="12" rx="3" fill="{c}"/>'
+                         f'<text x="{x + bw + 10:.0f}" y="{by + 11}" font-size="13" font-weight="{600 if strong else 400}" '
+                         f'fill="{t["fg"] if strong else t["muted_fg"]}">{fmt(v)}</text>')
+            y += 76
+    body += (f'<line x1="9" y1="{H - 62}" x2="{W - 9}" y2="{H - 62}" stroke="{t["border"]}"/>'
+             f'<text x="32" y="{H - 34}" font-size="13" fill="{t["muted_fg"]}">CT and MRI: Skanda names the right finding 72% / 89% of the time and clears 91% / 94% of lesion-free scans. '
+             f'Chest X-ray is a trade: small test set (±10 pts).</text>')
+    return svg(W, H, body, defs)
+
+
+def skanda_pipeline(t, theme):
+    """How it is built and trained: architecture row, stage row with gates, stat strip."""
+    W, H = 1200, 540
+    acc = SKANDA[theme]
+    defs = shadow_sm(t) + (f'<marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
+                           f'<path d="M0 0L10 5L0 10z" fill="{t["muted_fg"]}"/></marker>')
+    body = frame(t, W, H)
+    body += (f'<text x="32" y="56" font-size="20" font-weight="600" letter-spacing="-0.4" fill="{t["fg"]}">How Skanda is built</text>'
+             f'<text x="32" y="80" font-size="14" fill="{t["muted_fg"]}">The language model points with a [SEG] token; SAM 2 turns each pointer into an outline.</text>')
+
+    # architecture: four nodes, state written as a badge (not colour alone)
+    nodes = [("scan", "Image", ["Chest X-ray, CT or MRI", "slice or 32-slice volume"], "Input", "outline"),
+             ("sparkles", "Qwen3-VL-30B-A3B", ["31B MoE, ~3B active per token", "LoRA r=64 · vision LoRA 11/27"], "Fine-tuned", "secondary"),
+             ("zap", "[SEG] projector", ["Hidden state at each [SEG]", "MLP 2048 → 2048 → 256"], "New", "default"),
+             ("layers", "SAM 2.1 decoder", ["One outline per finding", "+ object score · 3D Dice"], "Fine-tuned", "secondary")]
+    nw, ng, ny, nh = 254, 36, 108, 136
+    for i, (ic, title, lines, state, var) in enumerate(nodes):
+        x = 32 + i * (nw + ng)
+        hl = state == "New"
+        body += (f'<rect x="{x}" y="{ny}" width="{nw}" height="{nh}" rx="12" fill="{t["card"]}" stroke="{acc if hl else t["border"]}" stroke-width="{1.5 if hl else 1}"/>'
+                 f'<rect x="{x + 16}" y="{ny + 16}" width="32" height="32" rx="8" fill="{t["muted"]}" stroke="{t["border"]}"/>'
+                 + icon(ic, x + 24, ny + 24, 16, t["fg"])
+                 + badge(t, x + nw - 16 - badge(t, 0, 0, state, var)[0], ny + 21, state, var)[1]
+                 + f'<text x="{x + 16}" y="{ny + 76}" font-size="16" font-weight="600" fill="{t["fg"]}">{escape(title)}</text>')
+        for j, line in enumerate(lines):
+            body += f'<text x="{x + 16}" y="{ny + 100 + j * 20}" font-size="13" fill="{t["muted_fg"]}">{escape(line)}</text>'
+        if i < len(nodes) - 1:
+            body += f'<line x1="{x + nw + 4}" y1="{ny + nh / 2}" x2="{x + nw + ng - 4}" y2="{ny + nh / 2}" stroke="{t["muted_fg"]}" stroke-width="1.5" marker-end="url(#ar)"/>'
+
+    # loss, as a code chip
+    ly = ny + nh + 22
+    loss = "loss = CE(report) + 2.0·BCE(mask) + 0.5·Dice(mask) + 0.2·BCE(object) + 0.5·score-head"
+    body += (f'<rect x="32" y="{ly}" width="{W - 64}" height="34" rx="8" fill="{t["muted"]}" fill-opacity=".6" stroke="{t["border"]}"/>'
+             f'<text x="48" y="{ly + 22}" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="{t["fg"]}">{escape(loss)}</text>')
+
+    # training stages with a gate between each: a stage is kept only if it beats the best so far
+    sy = ly + 66
+    body += (f'<text x="32" y="{sy}" font-size="13" font-weight="600" letter-spacing=".4" fill="{t["muted_fg"]}">TRAINING · 1× NVIDIA DGX SPARK (GB10, 128 GB)</text>')
+    stages = [("0", "Connector", "teach the projector what [SEG] means"),
+              ("1", "2D SFT", "full reports + outlines, X-ray and slices"),
+              ("2", "3D volumes", "33-slice CT / MRI, 40% 2D replay"),
+              ("3", "X-ray polish", "15% 3D replay at 0.3× learning rate")]
+    sw, sg, sty = 248, 48, sy + 18
+    for i, (num, name, note) in enumerate(stages):
+        x = 32 + i * (sw + sg)
+        body += (f'<rect x="{x}" y="{sty}" width="{sw}" height="74" rx="12" fill="{t["card"]}" stroke="{t["border"]}"/>'
+                 f'<circle cx="{x + 28}" cy="{sty + 26}" r="12" fill="{t["primary"]}"/>'
+                 f'<text x="{x + 28}" y="{sty + 30.5}" text-anchor="middle" font-size="12" font-weight="700" fill="{t["primary_fg"]}">{num}</text>'
+                 f'<text x="{x + 50}" y="{sty + 31}" font-size="15" font-weight="600" fill="{t["fg"]}">{name}</text>'
+                 f'<text x="{x + 16}" y="{sty + 58}" font-size="12.5" fill="{t["muted_fg"]}">{escape(note)}</text>')
+        if i < len(stages) - 1:  # gate: diamond + label
+            gx, gy = x + sw + sg / 2, sty + 37
+            body += (f'<line x1="{x + sw + 2}" y1="{gy}" x2="{x + sw + sg - 2}" y2="{gy}" stroke="{t["border"]}" stroke-width="1.5"/>'
+                     f'<rect x="{gx - 8}" y="{gy - 8}" width="16" height="16" rx="3" transform="rotate(45 {gx} {gy})" fill="{t["card"]}" stroke="{acc}" stroke-width="1.5"/>'
+                     f'<text x="{gx}" y="{gy - 16}" text-anchor="middle" font-size="11" font-weight="600" fill="{t["muted_fg"]}">gate</text>')
+
+    # stat strip
+    stats = [("26.8K", "training records"), ("7", "licensed datasets"), ("3", "modalities"),
+             ("~80 GB", "training memory"), ("62.6 GB", "run 3 checkpoint")]
+    ty = sty + 74 + 24
+    body += f'<line x1="9" y1="{ty}" x2="{W - 9}" y2="{ty}" stroke="{t["border"]}"/>'
+    cw = (W - 64) / len(stats)
+    for i, (num, label) in enumerate(stats):
+        x = 32 + i * cw
+        body += (f'<text x="{x:.0f}" y="{ty + 40}" font-size="24" font-weight="700" letter-spacing="-0.6" fill="{t["fg"]}">{num}</text>'
+                 f'<text x="{x:.0f}" y="{ty + 62}" font-size="13" fill="{t["muted_fg"]}">{label}</text>')
+    return svg(W, H, body, defs)
+
+
+def jpeg_uri(name):
+    return "data:image/jpeg;base64," + base64.b64encode((ASSETS / name).read_bytes()).decode()
+
+
+def skanda_reads(t, theme):
+    """Real held-out reads: MedGemma beside Skanda, per modality."""
+    W, H = 1200, 404
+    acc = SKANDA[theme]
+    cases = [("xray", "Chest X-ray", "effusion + consolidation", "0.50", "0.89"),
+             ("ct", "CT", "right lung tumour", "0.01", "0.91"),
+             ("mri", "MRI", "brain tumour with oedema", "0.24", "0.97")]
+    defs = shadow_sm(t)
+    body = frame(t, W, H)
+    body += (f'<text x="32" y="56" font-size="20" font-weight="600" letter-spacing="-0.4" fill="{t["fg"]}">Same scan, two readers</text>'
+             f'<text x="32" y="80" font-size="14" fill="{t["muted_fg"]}">Saved benchmark reads on held-out cases. IoU = box overlap with the radiologist&apos;s outline.</text>')
+    cw, gap, im, ig = 360, 28, 172, 16
+    for i, (key, name, what, mg, sk) in enumerate(cases):
+        x = 32 + i * (cw + gap)
+        if i:
+            body += f'<line x1="{x - gap / 2}" y1="112" x2="{x - gap / 2}" y2="{H - 74}" stroke="{t["border"]}"/>'
+        body += (f'<text x="{x}" y="124" font-size="16" font-weight="600" fill="{t["fg"]}">{name}</text>'
+                 f'<text x="{x + tw(name, 16, 600) + 10:.0f}" y="124" font-size="13" fill="{t["muted_fg"]}">{what}</text>')
+        for j, (who, iou, strong) in enumerate((("MedGemma 27B", mg, False), ("Skanda", sk, True))):
+            ix, iy = x + j * (im + ig), 140
+            cid = f"r{i}{j}"
+            defs += f'<clipPath id="{cid}"><rect x="{ix}" y="{iy}" width="{im}" height="{im}" rx="10"/></clipPath>'
+            body += (f'<image x="{ix}" y="{iy}" width="{im}" height="{im}" href="{jpeg_uri(f"skanda-read-{key}-{"medgemma" if j == 0 else "skanda"}.jpg")}" clip-path="url(#{cid})" preserveAspectRatio="xMidYMid slice"/>'
+                     f'<rect x="{ix + .5}" y="{iy + .5}" width="{im - 1}" height="{im - 1}" rx="10" fill="none" stroke="{acc if strong else t["border"]}" stroke-width="{1.5 if strong else 1}"/>'
+                     f'<text x="{ix}" y="{iy + im + 22}" font-size="13" fill="{t["muted_fg"]}">{who}</text>'
+                     f'<text x="{ix + im}" y="{iy + im + 22}" text-anchor="end" font-size="13" font-weight="{600 if strong else 400}" fill="{t["fg"] if strong else t["muted_fg"]}">IoU {iou}</text>')
+    # legend: line style + colour + words
+    ly = H - 34
+    body += f'<line x1="9" y1="{H - 62}" x2="{W - 9}" y2="{H - 62}" stroke="{t["border"]}"/>'
+    body += (f'<line x1="32" y1="{ly - 4}" x2="56" y2="{ly - 4}" stroke="{SEG_GOLD}" stroke-width="2" stroke-dasharray="5 3"/>'
+             f'<text x="64" y="{ly}" font-size="13" fill="{t["muted_fg"]}">Radiologist</text>'
+             f'<line x1="170" y1="{ly - 4}" x2="194" y2="{ly - 4}" stroke="#94a3b8" stroke-width="2"/>'
+             f'<text x="202" y="{ly}" font-size="13" fill="{t["muted_fg"]}">MedGemma box</text>'
+             f'<line x1="330" y1="{ly - 4}" x2="354" y2="{ly - 4}" stroke="#38bdf8" stroke-width="3"/>'
+             f'<text x="362" y="{ly}" font-size="13" fill="{t["muted_fg"]}">Skanda outline + box</text>'
+             f'<text x="{W - 32}" y="{ly}" text-anchor="end" font-size="13" fill="{t["muted_fg"]}">Cases chosen by a fixed rule; the benchmark shows how often.</text>')
     return svg(W, H, body, defs)
 
 
 def hero(t, theme):
-    W, H = 1200, 770
+    W, H = 1200, 816
     dark = theme == "dark"
     defs = (
         f'<pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.1" fill="{t["dot"]}"/></pattern>'
@@ -341,6 +522,7 @@ def hero(t, theme):
             ("plane", "Avionics", "ARINC 615A / 665 · VxWorks"),
             ("shield", "Assurance", "DO-178C · MISRA · CBMC · MC/DC"),
             ("wrench", "Tools", "Code-OSS · Tauri · React · Qt 6"),
+            ("scan", "Training", "Qwen3-VL · SAM 2 · LoRA · GRPO"),
             ("sparkles", "Intelligence", "vLLM · NVFP4 · agents · voice AI")]
     rh, tb, sb, gl, fb = 46, 40, 54, 34, 42
     wh = tb + sb + gl + len(rows) * rh + 8 + fb
@@ -401,7 +583,7 @@ def bento(t, theme):
          ["Avionics data loading, high-reliability control and", "safety-critical firmware for aircraft systems."]),
         (600, 8, 292, 190, "cpu", "Embedded", ["STM32 · ESP32 · Embedded", "Linux HMI · telemetry"]),
         (900, 8, 292, 190, "wrench", "Developer Tools", ["AI-native IDEs, verification", "pipelines, traceability"]),
-        (8, 206, 388, 190, "sparkles", "Applied AI", ["Voice assistants, research agents", "and knowledge graphs"]),
+        (8, 206, 388, 190, "scan", "Model Training", ["Grounded radiology VLMs, voice", "assistants and research agents"]),
         (404, 206, 788, 190, "zap", "MLOps & Inference",
          ["Serving 35B mixture-of-experts models on a single NVIDIA DGX Spark.", "vLLM · NVFP4 / FP8 quantization · speculative decoding · observability"]),
     ]
@@ -455,6 +637,7 @@ def inference(t, theme):
 def stack(t, theme):
     """shadcn <Table> inside a card: layer → technologies."""
     layers = [("sparkles", "Intelligence", ["vLLM", "NVFP4 / FP8", "Speculative decoding", "Voice AI", "Agents", "Claude · Gemini · Codex"]),
+              ("scan", "Training", ["Qwen3-VL", "SAM 2.1", "PEFT / LoRA", "GRPO", "MONAI", "Grafana"]),
               ("wrench", "Tools", ["TypeScript", "React", "Tauri", "Code-OSS", "FastAPI", "PySide6"]),
               ("shield", "Assurance", ["DO-178C", "MISRA", "CBMC", "CodeQL", "MC/DC", "Traceability"]),
               ("plane", "Systems", ["C++23", "Rust", "Qt 6", "Embedded Linux", "VxWorks", "ARINC 615A / 665"]),
@@ -500,9 +683,10 @@ def footer(t, theme):
 
 # ── main ─────────────────────────────────────────────────────────────────────
 
-WIDE = {"noyce", "wirevoice", "openterminalui", "arinc", "ornith"}
+WIDE = {"skanda", "noyce", "wirevoice", "openterminalui", "arinc", "ornith"}
 HEADINGS = {
-    "about": ("About", "Aerospace, embedded systems, developer tools and applied AI."),
+    "about": ("About", "Aerospace, embedded systems, developer tools, applied AI and model training."),
+    "train": ("Custom model training", "Skanda: a 31B vision-language model, fine-tuned end to end on one DGX Spark."),
     "now": ("Building now", "What I'm shipping at the moment."),
     "award": ("Recognition", "Hackathons and awards."),
     "oss": ("Open source", "Projects anyone can run, fork and extend."),
@@ -525,6 +709,9 @@ def main():
             f"inference-{theme}.svg": inference(t, theme),
             f"stack-{theme}.svg": stack(t, theme),
             f"footer-{theme}.svg": footer(t, theme),
+            f"skanda-bench-{theme}.svg": skanda_bench(t, theme),
+            f"skanda-pipeline-{theme}.svg": skanda_pipeline(t, theme),
+            f"skanda-reads-{theme}.svg": skanda_reads(t, theme),
         }
         for k, p in PROJECTS.items():
             files[f"card-{k}-{theme}.svg"] = card(k, p, t, theme, counts, k in WIDE)

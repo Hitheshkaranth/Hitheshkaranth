@@ -178,25 +178,7 @@ I lead technology at [FlyVI Technologies](https://www.flyvitech.com/), building 
   <img src="./assets/gen/skanda-bench-light.svg?v=39dae0ae" width="100%" alt="Held-out benchmark, Skanda run 3 vs MedGemma 27B, percent. Chest X-ray: normals called normal 69 vs 72, right finding type 40.5 vs 41, box precision 25.5 vs 6. CT: 91 vs 6, 72 vs 49, 22 vs 1. MRI: 94 vs 2, 89 vs 42, 70 vs 6.">
 </picture>
 
-<details>
-<summary><b>Training details</b></summary>
-<br>
-
-| | |
-|---|---|
-| **Backbone** | Qwen3-VL-30B-A3B-Instruct (31B MoE, ~3B active). LoRA r=64 on attention, LoRA on the vision encoder's last 11 of 27 blocks, trainable `[SEG]` rows at 20× LR |
-| **Grounding** | LISA-style `[SEG]` token → new 2048→2048→256 projector → SAM 2.1 Hiera-L mask decoder (weights from Sa2VA), image encoder frozen and cached |
-| **Heads** | Score head: p(abnormal) + 13 X-ray classes, drives a calibrated gate and a hint line before the report |
-| **Loss** | text CE (JSON boilerplate × 0.3) + 2.0 mask BCE + 0.5 mask Dice (3D Dice on volumes) + 0.2 object-score BCE + 0.5 score-head loss |
-| **Stages** | 0 connector → 1 2D SFT → 2 3D volumes (40% 2D replay, lesion-free volumes) → 3 X-ray polish (0.3× LR). A gate after every stage keeps it only if it matches the best so far |
-| **RL** | GRPO tried in runs 1–2 (reward = valid JSON + correct call + outline Dice + type/side); run 1's made every X-ray abnormal, run 2's was dropped by the gate |
-| **Data** | ChestX-Det, CheXmask, NIH ChestX-ray14, Medical Segmentation Decathlon, ISLES 2022, DeepLesion, autoPET. A lineage gate refuses non-commercial sets and model-written text; patient-level splits |
-| **Evidence** | Side, zone, size in mm, volume in mL and HU are measured from radiologist masks, never written by a model |
-| **Hardware** | 1× NVIDIA DGX Spark (GB10, 128 GB unified). Batch 1 × grad-accum 8, bf16, gradient checkpointing, ~80 GB in training, ~68 GB to serve |
-| **Next** | Run 4 is training: PTX-498, LUNA16, CRLM, HCC-TACE-Seg and SOOP to close the pneumothorax, nodule and liver gaps |
-
-<sub>Research use only. Skanda drafts findings for a radiologist to review; it is not a medical device.</sub>
-</details>
+<p align="center"><sub>Research use only. Skanda drafts findings for a radiologist to review; it is not a medical device.</sub></p>
 
 <br><br>
 

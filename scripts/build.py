@@ -174,7 +174,6 @@ LUCIDE = {
     "globe": '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>',
     "folder": '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
     "scan": '<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="1"/><path d="M18.944 12.33a1 1 0 0 0 0-.66 7.5 7.5 0 0 0-13.888 0 1 1 0 0 0 0 .66 7.5 7.5 0 0 0 13.888 0"/>',
-    "layers": '<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
     "award": '<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>',
 }
 BRANDS = {  # filled marks, 24×24
@@ -369,75 +368,6 @@ def skanda_bench(t, theme):
     body += (f'<line x1="9" y1="{H - 62}" x2="{W - 9}" y2="{H - 62}" stroke="{t["border"]}"/>'
              f'<text x="32" y="{H - 34}" font-size="13" fill="{t["muted_fg"]}">CT and MRI: Skanda names the right finding 72% / 89% of the time and clears 91% / 94% of lesion-free scans. '
              f'Chest X-ray is a trade: small test set (±10 pts).</text>')
-    return svg(W, H, body, defs)
-
-
-def skanda_pipeline(t, theme):
-    """How it is built and trained: architecture row, stage row with gates, stat strip."""
-    W, H = 1200, 540
-    acc = SKANDA[theme]
-    defs = shadow_sm(t) + (f'<marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
-                           f'<path d="M0 0L10 5L0 10z" fill="{t["muted_fg"]}"/></marker>')
-    body = frame(t, W, H)
-    body += (f'<text x="32" y="56" font-size="20" font-weight="600" letter-spacing="-0.4" fill="{t["fg"]}">How Skanda is built</text>'
-             f'<text x="32" y="80" font-size="14" fill="{t["muted_fg"]}">The language model points with a [SEG] token; SAM 2 turns each pointer into an outline.</text>')
-
-    # architecture: four nodes, state written as a badge (not colour alone)
-    nodes = [("scan", "Image", ["Chest X-ray, CT or MRI", "slice or 32-slice volume"], "Input", "outline"),
-             ("sparkles", "Qwen3-VL-30B-A3B", ["31B MoE, ~3B active per token", "LoRA r=64 · vision LoRA 11/27"], "Fine-tuned", "secondary"),
-             ("zap", "[SEG] projector", ["Hidden state at each [SEG]", "MLP 2048 → 2048 → 256"], "New", "default"),
-             ("layers", "SAM 2.1 decoder", ["One outline per finding", "+ object score · 3D Dice"], "Fine-tuned", "secondary")]
-    nw, ng, ny, nh = 254, 36, 108, 136
-    for i, (ic, title, lines, state, var) in enumerate(nodes):
-        x = 32 + i * (nw + ng)
-        hl = state == "New"
-        body += (f'<rect x="{x}" y="{ny}" width="{nw}" height="{nh}" rx="12" fill="{t["card"]}" stroke="{acc if hl else t["border"]}" stroke-width="{1.5 if hl else 1}"/>'
-                 f'<rect x="{x + 16}" y="{ny + 16}" width="32" height="32" rx="8" fill="{t["muted"]}" stroke="{t["border"]}"/>'
-                 + icon(ic, x + 24, ny + 24, 16, t["fg"])
-                 + badge(t, x + nw - 16 - badge(t, 0, 0, state, var)[0], ny + 21, state, var)[1]
-                 + f'<text x="{x + 16}" y="{ny + 76}" font-size="16" font-weight="600" fill="{t["fg"]}">{escape(title)}</text>')
-        for j, line in enumerate(lines):
-            body += f'<text x="{x + 16}" y="{ny + 100 + j * 20}" font-size="13" fill="{t["muted_fg"]}">{escape(line)}</text>'
-        if i < len(nodes) - 1:
-            body += f'<line x1="{x + nw + 4}" y1="{ny + nh / 2}" x2="{x + nw + ng - 4}" y2="{ny + nh / 2}" stroke="{t["muted_fg"]}" stroke-width="1.5" marker-end="url(#ar)"/>'
-
-    # loss, as a code chip
-    ly = ny + nh + 22
-    loss = "loss = CE(report) + 2.0·BCE(mask) + 0.5·Dice(mask) + 0.2·BCE(object) + 0.5·score-head"
-    body += (f'<rect x="32" y="{ly}" width="{W - 64}" height="34" rx="8" fill="{t["muted"]}" fill-opacity=".6" stroke="{t["border"]}"/>'
-             f'<text x="48" y="{ly + 22}" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="{t["fg"]}">{escape(loss)}</text>')
-
-    # training stages with a gate between each: a stage is kept only if it beats the best so far
-    sy = ly + 66
-    body += (f'<text x="32" y="{sy}" font-size="13" font-weight="600" letter-spacing=".4" fill="{t["muted_fg"]}">TRAINING · 1× NVIDIA DGX SPARK (GB10, 128 GB)</text>')
-    stages = [("0", "Connector", "teach the projector what [SEG] means"),
-              ("1", "2D SFT", "full reports + outlines, X-ray and slices"),
-              ("2", "3D volumes", "33-slice CT / MRI, 40% 2D replay"),
-              ("3", "X-ray polish", "15% 3D replay at 0.3× learning rate")]
-    sw, sg, sty = 248, 48, sy + 18
-    for i, (num, name, note) in enumerate(stages):
-        x = 32 + i * (sw + sg)
-        body += (f'<rect x="{x}" y="{sty}" width="{sw}" height="74" rx="12" fill="{t["card"]}" stroke="{t["border"]}"/>'
-                 f'<circle cx="{x + 28}" cy="{sty + 26}" r="12" fill="{t["primary"]}"/>'
-                 f'<text x="{x + 28}" y="{sty + 30.5}" text-anchor="middle" font-size="12" font-weight="700" fill="{t["primary_fg"]}">{num}</text>'
-                 f'<text x="{x + 50}" y="{sty + 31}" font-size="15" font-weight="600" fill="{t["fg"]}">{name}</text>'
-                 f'<text x="{x + 16}" y="{sty + 58}" font-size="12.5" fill="{t["muted_fg"]}">{escape(note)}</text>')
-        if i < len(stages) - 1:  # gate: diamond + label
-            gx, gy = x + sw + sg / 2, sty + 37
-            body += (f'<line x1="{x + sw + 2}" y1="{gy}" x2="{x + sw + sg - 2}" y2="{gy}" stroke="{t["border"]}" stroke-width="1.5"/>'
-                     f'<rect x="{gx - 8}" y="{gy - 8}" width="16" height="16" rx="3" transform="rotate(45 {gx} {gy})" fill="{t["card"]}" stroke="{acc}" stroke-width="1.5"/>'
-                     f'<text x="{gx}" y="{gy - 16}" text-anchor="middle" font-size="11" font-weight="600" fill="{t["muted_fg"]}">gate</text>')
-
-    # stat strip
-    stats = [("26.8K", "training records"), ("7", "licensed datasets"), ("3", "modalities"),
-             ("~80 GB", "training memory"), ("62.6 GB", "run 3 checkpoint")]
-    ty = sty + 74 + 24
-    body += f'<line x1="9" y1="{ty}" x2="{W - 9}" y2="{ty}" stroke="{t["border"]}"/>'
-    cw = (W - 64) / len(stats)
-    for i, (num, label) in enumerate(stats):
-        x = 32 + i * cw
-        body += (f'<text x="{x:.0f}" y="{ty + 40}" font-size="24" font-weight="700" letter-spacing="-0.6" fill="{t["fg"]}">{num}</text>'
-                 f'<text x="{x:.0f}" y="{ty + 62}" font-size="13" fill="{t["muted_fg"]}">{label}</text>')
     return svg(W, H, body, defs)
 
 
@@ -710,7 +640,6 @@ def main():
             f"stack-{theme}.svg": stack(t, theme),
             f"footer-{theme}.svg": footer(t, theme),
             f"skanda-bench-{theme}.svg": skanda_bench(t, theme),
-            f"skanda-pipeline-{theme}.svg": skanda_pipeline(t, theme),
             f"skanda-reads-{theme}.svg": skanda_reads(t, theme),
         }
         for k, p in PROJECTS.items():

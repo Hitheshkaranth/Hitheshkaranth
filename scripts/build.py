@@ -635,11 +635,21 @@ TERM = dict(bg="#0a0a0c", bar="#141417", fg="#e4e4e7", muted="#71717a", dim="#3f
             green="#4ade80", sky="#38bdf8", amber="#fbbf24", pink="#f472b6")
 SPIN = list("⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏")
 FLIP = ""
-NAME_ART = ['    __  ___ __  __              __       __ __                       __  __',
-            '   / / / (_) /_/ /_  ___  _____/ /_     / //_/___ __________ _____  / /_/ /_',
-            '  / /_/ / / __/ __ \\/ _ \\/ ___/ __ \\   / ,< / __ `/ ___/ __ `/ __ \\/ __/ __ \\',
-            ' / __  / / /_/ / / /  __(__  ) / / /  / /| / /_/ / /  / /_/ / / / / /_/ / / /',
-            '/_/ /_/_/\\__/_/ /_/\\___/____/_/ /_/  /_/ |_\\__,_/_/   \\__,_/_/ /_/\\__/_/ /_/']  # pyfiglet "slant"
+NAME_ART = [  # pyfiglet "ansi_shadow", stacked; the blank row is the gap between the words
+    '██╗  ██╗██╗████████╗██╗  ██╗███████╗███████╗██╗  ██╗',
+    '██║  ██║██║╚══██╔══╝██║  ██║██╔════╝██╔════╝██║  ██║',
+    '███████║██║   ██║   ███████║█████╗  ███████╗███████║',
+    '██╔══██║██║   ██║   ██╔══██║██╔══╝  ╚════██║██╔══██║',
+    '██║  ██║██║   ██║   ██║  ██║███████╗███████║██║  ██║',
+    '╚═╝  ╚═╝╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝',
+    '',
+    '██╗  ██╗ █████╗ ██████╗  █████╗ ███╗   ██╗████████╗██╗  ██╗',
+    '██║ ██╔╝██╔══██╗██╔══██╗██╔══██╗████╗  ██║╚══██╔══╝██║  ██║',
+    '█████╔╝ ███████║██████╔╝███████║██╔██╗ ██║   ██║   ███████║',
+    '██╔═██╗ ██╔══██║██╔══██╗██╔══██║██║╚██╗██║   ██║   ██╔══██║',
+    '██║  ██╗██║  ██║██║  ██║██║  ██║██║ ╚████║   ██║   ██║  ██║',
+    '╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝',
+]
 
 
 def lines_text(lines, x, y, size, lh, fill, extra=""):
@@ -660,7 +670,7 @@ def flipbook(frames, x, y, size, fill, period, family=None, lh=None):
     out = (f'<style>@keyframes {name}{{0%{{opacity:1}}{100 / n - .005:.3f}%,100%{{opacity:0}}}}'
            f'.{name}{{animation:{name} {period}s steps(1,end) infinite}}</style>')
     for k, fr in enumerate(frames):
-        attrs = f' class="{name}" style="animation-delay:{-k * period / n:.3f}s"' + ('' if k == 0 else ' opacity="0"')
+        attrs = f' class="{name}" style="animation-delay:{k * period / n:.3f}s"' + ('' if k == 0 else ' opacity="0"')
         if isinstance(fr, str):
             out += (f'<text x="{x}" y="{y}" font-family="{family or MONO}" font-size="{size}" fill="{fill}"{attrs}>'
                     f'{escape(fr)}</text>')
@@ -704,6 +714,181 @@ def torus_frames(cols=64, rows=30, n=36):
     return frames
 
 
+# ── hero: one rotation per field ─────────────────────────────────────────────
+# Each field is a flat silhouette (drawn with polygons, no fonts needed in CI),
+# extruded into a solid and lit like the classic ASCII torus.
+
+FIELDS = [  # name, what I do there, stack, where it shows up
+    ("SILICON", "bare-metal C on microcontrollers, register to pixel", ["C", "STM32", "ESP32-C6", "LVGL"], "netra-device-firmware"),
+    ("FIRMWARE", "drivers, buses and telemetry for control hardware", ["CAN", "UART", "USB", "RTOS"], "power-electronics controllers"),
+    ("AVIONICS", "load software onto aircraft over ethernet", ["ARINC 615A", "ARINC 665", "VxWorks", "TFTP"], "arinc-615a-cli-tool-suite"),
+    ("ASSURANCE", "evidence that records what was measured", ["DO-178C", "MISRA", "CBMC", "MC/DC"], "noyce-ide"),
+    ("TOOLS", "workbenches, terminals and HMI studios", ["Code-OSS", "Tauri", "React", "Qt 6"], "openterminalui · embedded-display-studio"),
+    ("TRAINING", "grounded vision-language models, end to end", ["Qwen3-VL", "SAM 2.1", "LoRA", "GRPO"], "skanda-grounding"),
+    ("INTELLIGENCE", "35B mixture-of-experts on one DGX Spark", ["vLLM", "NVFP4", "MTP", "agents"], "ornith · qwen3.8 · wirevoice"),
+]
+
+
+def field_mask(name, S=96):
+    from PIL import ImageDraw
+    im = Image.new("L", (S, S), 0)
+    d = ImageDraw.Draw(im)
+    if name == "SILICON":                       # chip: body, pins, recessed die
+        d.rectangle((22, 22, 74, 74), fill=255)
+        for k in range(5):
+            o = 27 + k * 10
+            d.rectangle((o, 11, o + 4, 21), fill=255); d.rectangle((o, 75, o + 4, 85), fill=255)
+            d.rectangle((11, o, 21, o + 4), fill=255); d.rectangle((75, o, 85, o + 4), fill=255)
+        d.rectangle((35, 35, 61, 61), fill=0); d.rectangle((41, 41, 55, 55), fill=255)
+        d.ellipse((26, 26, 31, 31), fill=0)
+    elif name == "FIRMWARE":                    # </>
+        d.polygon([(6, 48), (32, 22), (40, 30), (22, 48), (40, 66), (32, 74)], fill=255)
+        d.polygon([(90, 48), (64, 22), (56, 30), (74, 48), (56, 66), (64, 74)], fill=255)
+        d.polygon([(54, 14), (62, 14), (42, 82), (34, 82)], fill=255)
+    elif name == "AVIONICS":                    # aircraft, top view
+        d.ellipse((43, 4, 53, 90), fill=255)
+        d.polygon([(48, 32), (93, 56), (93, 63), (48, 52), (3, 63), (3, 56)], fill=255)
+        d.polygon([(48, 72), (68, 85), (68, 90), (48, 84), (28, 90), (28, 85)], fill=255)
+    elif name == "ASSURANCE":                   # shield with a check
+        d.polygon([(48, 4), (84, 16), (82, 50), (48, 92), (14, 50), (12, 16)], fill=255)
+        d.line([(30, 48), (44, 62), (68, 32)], fill=0, width=9)
+    elif name == "TOOLS":                       # gear
+        import math as _m
+        for k in range(10):
+            a = 2 * _m.pi * k / 10
+            pts = [(48 + r * _m.cos(a + da), 48 + r * _m.sin(a + da)) for r, da in ((26, -.2), (43, -.13), (43, .13), (26, .2))]
+            d.polygon(pts, fill=255)
+        d.ellipse((17, 17, 79, 79), fill=255); d.ellipse((35, 35, 61, 61), fill=0)
+    elif name == "TRAINING":                    # a small neural network
+        layers = [[22, 48, 74], [12, 36, 60, 84], [30, 66]]
+        xs = [14, 48, 82]
+        for li in range(2):
+            for y0 in layers[li]:
+                for y1 in layers[li + 1]:
+                    d.line([(xs[li], y0), (xs[li + 1], y1)], fill=255, width=3)
+        for li, ys in enumerate(layers):
+            for y0 in ys:
+                d.ellipse((xs[li] - 9, y0 - 9, xs[li] + 9, y0 + 9), fill=255)
+    elif name == "INTELLIGENCE":                # sparkles
+        d.polygon([(44, 6), (53, 39), (86, 48), (53, 57), (44, 90), (35, 57), (2, 48), (35, 39)], fill=255)
+        d.polygon([(80, 4), (83, 14), (93, 17), (83, 20), (80, 30), (77, 20), (67, 17), (77, 14)], fill=255)
+    return im
+
+
+def solid_render(mask_pts, th, cols, rows, tilt=.32):
+    """Render an extruded silhouette at yaw `th` into rows of (char, colour)."""
+    import math
+    L = (-.35, .55, .76)
+    ln = math.sqrt(sum(v * v for v in L)); L = tuple(v / ln for v in L)
+    ct, st = math.cos(th), math.sin(th)
+    cx_, sx_ = math.cos(tilt), math.sin(tilt)
+    zbuf = [[-9.0] * cols for _ in range(rows)]
+    out = [[(" ", None)] * cols for _ in range(rows)]
+    face = "-=+*#%@$"
+    wall = ".,:;"
+    for x, y, z, nx, ny, nz in mask_pts:
+        x1, z1 = x * ct + z * st, -x * st + z * ct
+        y2, z2 = y * cx_ - z1 * sx_, y * sx_ + z1 * cx_
+        n1x, n1z = nx * ct + nz * st, -nx * st + nz * ct
+        n2y, n2z = ny * cx_ - n1z * sx_, ny * sx_ + n1z * cx_
+        ooz = 1 / (3.2 - z2)
+        xp = int(cols / 2 + cols * 1.18 * ooz * x1)
+        yp = int(rows * .46 - rows * 1.32 * ooz * y2)
+        if 0 <= xp < cols and 0 <= yp < rows and z2 > zbuf[yp][xp]:
+            zbuf[yp][xp] = z2
+            lum = max(0, min(1, (n1x * L[0] + n2y * L[1] + n2z * L[2]) * .5 + .5))
+            if nz:
+                ch = face[min(len(face) - 1, int(lum ** 1.25 * len(face)))]
+                colr = TERM["sky"] if ch in "@$" else TERM["fg"] if ch in "*#%" else TERM["muted"]
+            else:
+                ch = wall[min(len(wall) - 1, int(lum * len(wall)))]
+                colr = TERM["dim"] if ch in ".," else TERM["muted"]
+            out[yp][xp] = (ch, colr)
+    return out
+
+
+def field_points(name, depth=.11):
+    m = field_mask(name)
+    S = m.size[0]
+    px = m.load()
+    on = lambda i, j: 0 <= i < S and 0 <= j < S and px[j, i] > 127
+    pts = []
+    for i in range(S):
+        for j in range(S):
+            if not on(i, j):
+                continue
+            x, y = (j - S / 2) / (S / 2), -(i - S / 2) / (S / 2)
+            pts.append((x, y, depth, 0, 0, 1)); pts.append((x, y, -depth, 0, 0, -1))
+            for di, dj in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+                if not on(i + di, j + dj):
+                    for k in range(7):
+                        pts.append((x + dj * .5 / (S / 2), y - di * .5 / (S / 2), -depth + 2 * depth * k / 6, dj, -di, 0))
+    return pts
+
+
+def flip_rows(frames, x, y, size, lh, period, cls):
+    """Flipbook of rows-of-segments frames (frame 0 = the still picture)."""
+    n = len(frames)
+    name = f"fb{n}x{int(period * 100)}{cls}"
+    out = (f'<style>@keyframes {name}{{0%{{opacity:1}}{100 / n - .005:.3f}%,100%{{opacity:0}}}}'
+           f'.{name}{{animation:{name} {period}s steps(1,end) infinite}}.{cls}{{font-family:{MONO};font-size:{size}px}}</style>')
+    for k, fr in enumerate(frames):
+        out += f'<g class="{name}" style="animation-delay:{k * period / n:.3f}s"' + ('' if k == 0 else ' opacity="0"') + '>'
+        for r, segs in enumerate(fr):
+            out += mono_row(x, y + r * lh, size, segs, cls=cls)
+        out += '</g>'
+    return out
+
+
+def hero_stage(per=18, cols=86, art_rows=30):
+    """Per-frame: the turning object, its shadow and live readouts."""
+    import math
+    frames = []
+    for fi, (name, *_ ) in enumerate(FIELDS):
+        pts = field_points(name)
+        for f in range(per):
+            u = f / per
+            ease = u - math.sin(2 * math.pi * u) / (2 * math.pi)   # lingers face-on, sweeps the edge
+            th = .38 + 2 * math.pi * ease
+            g = Grid(cols, art_rows + 1)
+            art = solid_render(pts, th, cols - 8, art_rows - 2)
+            for r, row in enumerate(art):
+                for c, (ch, colr) in enumerate(row):
+                    if ch != " ":
+                        g.put(r + 2, c + 4, ch, colr)
+            # soft ground shadow, narrowing as the object turns edge-on
+            span = abs(math.cos(th)) * .3 + .08
+            for c in range(cols):
+                d = (c - cols / 2) / (cols * span)
+                if abs(d) < 1:
+                    g.put(art_rows - 1, c, "·" if abs(d) < .7 else ".", TERM["dim"])
+            yaw = math.degrees(th) % 360
+            g.puts(1, 2, ("yaw ", TERM["dim"]), (f"{yaw:5.1f}°", TERM["muted"]), ("  tilt ", TERM["dim"]), ("18.3°", TERM["muted"]))
+            pc = f"{len(pts):,} pts"
+            g.puts(1, cols - 2 - len(pc) - 5, ("mesh ", TERM["dim"]), (pc, TERM["muted"]))
+            frames.append(g.rows())
+    return frames
+
+
+def hero_captions(cols=74):
+    frames = []
+    for fi, (name, what, stack, proj) in enumerate(FIELDS):
+        g = Grid(cols, 8)
+        g.puts(0, 0, (f"{fi + 1:02d}/{len(FIELDS):02d}", TERM["sky"]), (" ── ", TERM["dim"]), (name, TERM["fg"]))
+        g.put(1, 0, what, TERM["muted"])
+        c = 0
+        for item in stack:
+            c = g.puts(2, c, ("[ ", TERM["dim"]), (item, TERM["fg"]), (" ]", TERM["dim"]), (" ", None))
+        g.puts(3, 0, ("↳ ", TERM["green"]), (proj, TERM["green"]))
+        seg = (cols - 2) // len(FIELDS)
+        for k, (nm, *_ ) in enumerate(FIELDS):
+            g.put(5, k * seg, ("━" if k <= fi else "─") * (seg - 1), TERM["sky"] if k == fi else (TERM["muted"] if k < fi else TERM["dim"]))
+            label = {"INTELLIGENCE": "intel"}.get(nm, nm.lower())[: seg - 1]
+            g.put(6, k * seg, label, TERM["fg"] if k == fi else TERM["dim"])
+        frames.append(g.rows())
+    return frames
+
+
 def term_window(t, W, H, title):
     """macOS-style terminal window: always dark, in both themes."""
     return (f'<rect x="8" y="8" width="{W - 16}" height="{H - 16}" rx="14" fill="{TERM["bg"]}" stroke="{t["border"]}" filter="url(#sm)"/>'
@@ -724,27 +909,48 @@ def cursor(x, y, size=14):
 
 
 def ascii_hero(t, theme):
-    W, H = 1200, 452
+    W, H = 1200, 600
     cw = 14 * .6  # monospace advance at 14px
     defs = shadow_sm(t) + (f'<linearGradient id="nameInk" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fafafa"/>'
-                           f'<stop offset="1" stop-color="{TERM["sky"]}"/></linearGradient>')
+                           f'<stop offset=".55" stop-color="#bae6fd"/><stop offset="1" stop-color="{TERM["sky"]}"/></linearGradient>'
+                           f'<filter id="nameGlow" x="-5%" y="-10%" width="110%" height="120%"><feGaussianBlur in="SourceAlpha" stdDeviation="4"/>'
+                           f'<feComponentTransfer><feFuncA type="linear" slope=".55"/></feComponentTransfer><feColorMatrix type="matrix" '
+                           f'values="0 0 0 0 .22 0 0 0 0 .74 0 0 0 0 .97 0 0 0 1 0"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>')
     body = term_window(t, W, H, "hithesh@karanth: ~ — zsh")
-    body += lines_text(NAME_ART, 40, 88, 14, 17, "url(#nameInk)", ' font-weight="700"')
-    y = 214
-    rows = [("whoami", [[("Hithesh Karanth · CTO, FlyVI Technologies", TERM["fg"])]]),
-            ("cat focus.txt", [[("From silicon to intelligence, built to be verified.", TERM["muted"])]]),
-            ("ls ~/building", [[("noyce-ide/  ", TERM["sky"]), ("skanda-grounding/  ", TERM["sky"]),
-                                ("openterminalui/  ", TERM["sky"]), ("embedded-display-studio/", TERM["sky"])]])]
-    for cmd, outs in rows:
-        body += prompt(40, y, cmd)
-        y += 24
-        for segs in outs:
-            body += f'<text x="40" y="{y}" font-family="{MONO}" font-size="14" xml:space="preserve">'
-            body += "".join(f'<tspan fill="{c}">{escape(txt)}</tspan>' for txt, c in segs) + '</text>'
-            y += 30
-    body += f'<text x="40" y="{y}" font-family="{MONO}" font-size="14" fill="{TERM["green"]}">❯</text>' + cursor(40 + 2 * cw, y)
-    # spinning torus on the right
-    body += flipbook(torus_frames(), 790, 66, 9.5, TERM["fg"], 4.8, lh=12.2)
+    body += lines_text(NAME_ART, 40, 84, 15, 16, "url(#nameInk)", ' filter="url(#nameGlow)"')
+    y = 320
+    rows = [("whoami", [("Hithesh Karanth", TERM["fg"]), (" · CTO, FlyVI Technologies", TERM["muted"])]),
+            ("cat focus.txt", [("From silicon to intelligence, built to be verified.", TERM["muted"])]),
+            ("ls ~/building", [("noyce-ide/  ", TERM["sky"]), ("skanda-grounding/", TERM["sky"])]),
+            ("", [("openterminalui/  ", TERM["sky"]), ("embedded-display-studio/", TERM["sky"])])]
+    for cmd, segs in rows:
+        if cmd:
+            body += prompt(40, y, cmd)
+            y += 24
+        body += f'<text x="40" y="{y}" font-family="{MONO}" font-size="14" xml:space="preserve">'
+        body += "".join(f'<tspan fill="{c}">{escape(txt)}</tspan>' for txt, c in segs) + '</text>'
+        y += 24 if not cmd and False else (30 if rows.index((cmd, segs)) != 2 else 22)
+    y += 4
+    body += prompt(40, y, "fields --spin") + cursor(40 + 16 * cw, y)
+    # right: the field stage (viewport brackets, turning object, readouts) + synced captions
+    sx, sy, size, lh = 690, 62, 8.5, 10.4
+    period = 3.4 * len(FIELDS)
+    vw, vh = 86 * size * .6, 30 * lh + 6
+    br = TERM["muted"]
+    for cx, cy, dx, dy in ((sx - 6, sy - 6, 1, 1), (sx + vw + 2, sy - 6, -1, 1), (sx - 6, sy + vh - 10, 1, -1), (sx + vw + 2, sy + vh - 10, -1, -1)):
+        body += f'<path d="M{cx} {cy + 14 * dy}V{cy}H{cx + 14 * dx}" fill="none" stroke="{br}" stroke-width="1.2"/>'
+    body += flip_rows(hero_stage(), sx, sy, size, lh, period, "hs")
+    body += flip_rows(hero_captions(), sx, sy + vh + 18, 10.5, 15, period, "hc")
+    # tmux-style status bar
+    by = H - 46
+    body += (f'<rect x="9" y="{by}" width="{W - 18}" height="26" fill="#111114"/>'
+             f'<text x="24" y="{by + 17}" font-family="{MONO}" font-size="12" xml:space="preserve">'
+             f'<tspan fill="{TERM["bg"]}" style="font-weight:700">'
+             f'</tspan><tspan fill="{TERM["green"]}">[hk]</tspan><tspan fill="{TERM["fg"]}"> 0:zsh*</tspan>'
+             f'<tspan fill="{TERM["muted"]}">  1:noyce  2:skanda  3:otui  4:eds  5:spark</tspan></text>'
+             f'<text x="{W - 24}" y="{by + 17}" text-anchor="end" font-family="{MONO}" font-size="12" xml:space="preserve">'
+             f'<tspan fill="{TERM["green"]}">●</tspan><tspan fill="{TERM["muted"]}"> dgx-spark  </tspan>'
+             f'<tspan fill="{TERM["sky"]}">▲ 351.7 tok/s</tspan><tspan fill="{TERM["muted"]}">  │  hitheshkaranth.dev</tspan></text>')
     return svg(W, H, body, defs)
 
 
@@ -1408,7 +1614,7 @@ def ascii_panel(t, key, p, x, y, w, h, size=11):
             f'.m{{font-family:{MONO};font-size:{size}px}}</style>')
     top = y + 34 + size
     for k, fr in enumerate(frames):
-        out += f'<g class="{name}" style="animation-delay:{-k * period / n:.3f}s"' + ('' if k == 0 else ' opacity="0"') + '>'
+        out += f'<g class="{name}" style="animation-delay:{k * period / n:.3f}s"' + ('' if k == 0 else ' opacity="0"') + '>'
         for r, segs in enumerate(fr[:rows]):
             out += mono_row(x + 14, top + r * lh, size, segs, cls="m")
         out += '</g>'
